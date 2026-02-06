@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { createBrowserClient } from "@/lib/supabase/client";
 import { formatScore } from "@/lib/utils/scoring";
 import type { TranscriptEntry } from "@/types/evaluation";
 
@@ -82,9 +83,26 @@ export function VoiceEvalPanel({ agentId, agentName }: VoiceEvalPanelProps) {
     });
 
     try {
+      const supabase = createBrowserClient();
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw new Error(sessionError.message);
+      }
+
+      if (!session?.access_token) {
+        throw new Error("You must be signed in to start a voice evaluation.");
+      }
+
       const response = await fetch("/api/voice/initiate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ agent_id: agentId, phone_number: phoneNumber }),
       });
 

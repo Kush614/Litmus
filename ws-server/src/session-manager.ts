@@ -23,6 +23,7 @@ export interface SessionData {
   transcript: TranscriptEntry[];
   callId: string;
   agentId: string;
+  agentName?: string;
   startTime: Date;
 }
 
@@ -33,13 +34,18 @@ class SessionManager {
    * Creates a new Gemini Live session and stores it keyed by streamId.
    * The Gemini API key is read from the GEMINI_API_KEY environment variable.
    */
-  async createSession(streamId: string, callId: string, agentId: string): Promise<SessionData> {
+  async createSession(
+    streamId: string,
+    callId: string,
+    agentId: string,
+    agentName?: string
+  ): Promise<SessionData> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY environment variable is not set");
     }
 
-    const systemPrompt = getAgentSystemPrompt(agentId);
+    const systemPrompt = getAgentSystemPrompt(agentId, agentName);
     const geminiSession = await createLiveSession(apiKey, systemPrompt);
 
     const sessionData: SessionData = {
@@ -47,12 +53,13 @@ class SessionManager {
       transcript: [],
       callId,
       agentId,
+      agentName,
       startTime: new Date(),
     };
 
     this.sessions.set(streamId, sessionData);
     console.log(
-      `[SessionManager] Created session for streamId=${streamId}, callId=${callId}, agentId=${agentId}`
+      `[SessionManager] Created session for streamId=${streamId}, callId=${callId}, agentId=${agentId}, agentName=${agentName ?? "unknown"}`
     );
 
     return sessionData;

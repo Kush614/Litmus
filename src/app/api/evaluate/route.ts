@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 import { evaluateBenchmark, evaluateVoiceTranscript } from "@/lib/gemini/judge";
 import { handleApiError, validateWithZod, ValidationError } from "@/lib/utils/errors";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import type { BenchmarkType } from "@/types/benchmark";
 import type { TranscriptEntry } from "@/types/evaluation";
 
@@ -23,6 +24,8 @@ const evaluationRequestSchema = z.object({
     )
     .optional(),
   benchmark_type: z.string().optional(),
+  call_uuid: z.string().optional(),
+  duration_seconds: z.number().int().nonnegative().optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -68,8 +71,33 @@ export async function POST(request: Request): Promise<Response> {
         data.task_description
       );
 
+      if (data.call_uuid) {
+        const serviceClient = createServiceRoleClient();
+        const { data: updatedEvaluation, error: updateError } = await serviceClient
+          .from("voice_evaluations")
+          .update({
+            transcript: data.transcript as unknown as import("@/lib/supabase/types").Json,
+            scores: evaluation.scores as unknown as import("@/lib/supabase/types").Json,
+            gemini_evaluation: evaluation as unknown as import("@/lib/supabase/types").Json,
+            composite_score: evaluation.composite_score,
+            ...(data.duration_seconds ? { duration_seconds: data.duration_seconds } : {}),
+          })
+          .eq("call_uuid", data.call_uuid)
+          .select("id")
+          .maybeSingle();
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        if (!updatedEvaluation) {
+          console.warn(`[evaluate] No voice_evaluations row found for call_uuid=${data.call_uuid}`);
+        }
+      }
+
       return Response.json({
         type: data.type,
+        call_uuid: data.call_uuid,
         scores: evaluation.scores,
         justifications: evaluation.justifications,
         composite_score: evaluation.composite_score,

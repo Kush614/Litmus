@@ -13,14 +13,27 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const url = new URL(request.url);
     const agentId = url.searchParams.get("agent_id") ?? "unknown";
+    const agentName = url.searchParams.get("agent_name") ?? undefined;
 
-    const wsServerUrl = process.env.WS_SERVER_URL ?? `wss://${process.env.VERCEL_URL}/api/voice/ws`;
+    const wsServerEnv = process.env.WS_SERVER_URL;
+    if (!wsServerEnv) {
+      throw new Error("WS_SERVER_URL environment variable is not set");
+    }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? `https://${process.env.VERCEL_URL}`;
+    const parsedWsUrl = new URL(wsServerEnv);
+    if (!["ws:", "wss:"].includes(parsedWsUrl.protocol)) {
+      throw new Error("WS_SERVER_URL must use ws:// or wss://");
+    }
+    if (parsedWsUrl.pathname === "/" || parsedWsUrl.pathname === "") {
+      parsedWsUrl.pathname = "/ws";
+    }
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? url.origin;
 
     const xml = buildStreamResponse({
       agentId,
-      wsUrl: wsServerUrl,
+      agentName,
+      wsUrl: parsedWsUrl.toString(),
       statusCallbackUrl: `${appUrl}/api/voice/status`,
     });
 

@@ -30,7 +30,7 @@
    - 9.4 [Composio Toolkits (@composio/core)](#94-composio-toolkits-composiocore)
    - 9.5 [Intercom REST API](#95-intercom-rest-api)
 10. [Environment Variables](#10-environment-variables)
-11. [Deployment (Vercel)](#11-deployment-vercel)
+11. [Deployment (Render)](#11-deployment-render)
 12. [Hackathon Demo Script](#12-hackathon-demo-script)
 13. [Division of Labor (3-Person Team)](#13-division-of-labor-3-person-team)
 14. [Risk Mitigation](#14-risk-mitigation)
@@ -72,7 +72,7 @@ The AI agent market is exploding — customer support bots, coding copilots, res
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│                         VERCEL (Next.js 16)                         │
+│                  RENDER (Next.js + ws-server services)              │
 │                                                                      │
 │  ┌────────────┐  ┌──────────────┐  ┌───────────────┐               │
 │  │  App Router │  │ Route        │  │  WebSocket    │               │
@@ -120,15 +120,15 @@ The AI agent market is exploding — customer support bots, coding copilots, res
 
 ### Core Framework
 
-| Layer               | Technology | Version              | Notes                                                                          |
-| ------------------- | ---------- | -------------------- | ------------------------------------------------------------------------------ |
-| **Framework**       | Next.js    | 16.x (latest stable) | App Router, Turbopack default, React 19.2, `proxy.ts` replaces `middleware.ts` |
-| **React**           | React      | 19.2                 | View Transitions, `useEffectEvent`, Activity API                               |
-| **Language**        | TypeScript | 5.6+                 | Strict mode, `types` over `interfaces`, `undefined` over `null`                |
-| **UI Library**      | Shadcn UI  | Latest               | Radix primitives + Tailwind CSS                                                |
-| **Charts**          | Recharts   | 2.x                  | Radar charts for agent comparison, line charts for longitudinal performance    |
-| **Package Manager** | npm        | 10.x                 | Per requirement                                                                |
-| **Deployment**      | Vercel     | —                    | Serverless functions + Edge (for proxy.ts)                                     |
+| Layer               | Technology | Version              | Notes                                                                       |
+| ------------------- | ---------- | -------------------- | --------------------------------------------------------------------------- |
+| **Framework**       | Next.js    | 16.x (latest stable) | App Router, Turbopack default, React 19.2, middleware at `middleware.ts`    |
+| **React**           | React      | 19.2                 | View Transitions, `useEffectEvent`, Activity API                            |
+| **Language**        | TypeScript | 5.6+                 | Strict mode, `types` over `interfaces`, `undefined` over `null`             |
+| **UI Library**      | Shadcn UI  | Latest               | Radix primitives + Tailwind CSS                                             |
+| **Charts**          | Recharts   | 2.x                  | Radar charts for agent comparison, line charts for longitudinal performance |
+| **Package Manager** | npm        | 10.x                 | Per requirement                                                             |
+| **Deployment**      | Render     | —                    | Render Blueprint with separate web and WebSocket services                   |
 
 ### External Services
 
@@ -147,13 +147,13 @@ The AI agent market is exploding — customer support bots, coding copilots, res
 
 ```
 litmus/
-├── .env.local                          # Local environment variables (NEVER commit)
+├── .env                                # Local environment variables (NEVER commit)
 ├── .env.example                        # Template for required env vars
 ├── next.config.ts                      # Next.js 16 config (Turbopack default)
-├── tailwind.config.ts                  # Tailwind + Shadcn theme
+├── postcss.config.mjs                  # Tailwind v4 + PostCSS config
 ├── tsconfig.json                       # TypeScript strict config
 ├── package.json
-├── proxy.ts                            # Next.js 16 proxy (replaces middleware.ts)
+├── middleware.ts                       # Route protection middleware
 │
 ├── src/
 │   ├── app/
@@ -178,7 +178,7 @@ litmus/
 │   │   └── dashboard/
 │   │       └── page.tsx                # User dashboard (my evaluations, bookmarks)
 │   │
-│   ├── api/                            # Route Handlers (App Router)
+│   │   ├── api/                        # Route Handlers (App Router)
 │   │   ├── agents/
 │   │   │   ├── route.ts                # GET (list/search), POST (submit new agent)
 │   │   │   └── [slug]/
@@ -195,8 +195,6 @@ litmus/
 │   │   │   │   └── route.ts            # POST (initiate Plivo outbound call)
 │   │   │   ├── answer/
 │   │   │   │   └── route.ts            # POST (Plivo answer URL — returns XML)
-│   │   │   ├── ws/
-│   │   │   │   └── route.ts            # WebSocket handler for audio stream
 │   │   │   └── status/
 │   │   │       └── route.ts            # POST (Plivo stream status callback)
 │   │   │
@@ -266,6 +264,15 @@ litmus/
 │       ├── benchmark.ts                # Benchmark-related types
 │       ├── evaluation.ts               # Evaluation result types
 │       └── voice.ts                    # Voice evaluation types
+│
+├── ws-server/
+│   ├── Dockerfile                      # Render ws service image
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── src/
+│       ├── index.ts                    # Fastify + @fastify/websocket entrypoint
+│       ├── stream-handler.ts           # Plivo <-> Gemini Live bridge
+│       └── session-manager.ts          # Active call/session tracking
 │
 └── supabase/
     └── migrations/
@@ -466,8 +473,8 @@ Step 3: /api/voice/answer returns Plivo XML:
             keepCallAlive="true"
             bidirectional="true"
             contentType="audio/x-mulaw;rate=8000"
-            statusCallbackUrl="https://litmus.vercel.app/api/voice/status">
-            wss://litmus.vercel.app/api/voice/ws
+            statusCallbackUrl="https://litmus.onrender.com/api/voice/status">
+            wss://litmus-ws.onrender.com/ws
           </Stream>
         </Response>
             │
@@ -566,7 +573,7 @@ type PlivoClearAudioEvent = {
 /**
  * Gathers real-time web intelligence for a given agent.
  * Called on-demand when an agent profile is viewed,
- * and periodically via a Vercel Cron Job.
+ * and periodically via a Render Cron Job.
  */
 async function gatherIntelligence(agentName: string, agentVendor: string): Promise<void> {
   const queries = [
@@ -862,9 +869,7 @@ export async function POST(request: Request): Promise<Response> {
       "Say end evaluation when you are finished."
   );
 
-  const streamElement = plivoResponse.addStream(
-    `wss://${process.env.VERCEL_URL}/api/voice/ws?agent_id=${agentId}`
-  );
+  const streamElement = plivoResponse.addStream(`${process.env.WS_SERVER_URL}?agent_id=${agentId}`);
   streamElement.addAttribute("keepCallAlive", "true");
   streamElement.addAttribute("bidirectional", "true");
   streamElement.addAttribute("contentType", "audio/x-mulaw;rate=8000");
@@ -1290,7 +1295,7 @@ const headers = {
 
 ```bash
 # === Core ===
-NEXT_PUBLIC_APP_URL=https://litmus.vercel.app
+NEXT_PUBLIC_APP_URL=https://litmus.onrender.com
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
@@ -1312,72 +1317,48 @@ COMPOSIO_API_KEY=...
 # === Intercom ===
 INTERCOM_ACCESS_TOKEN=dG9r...
 INTERCOM_APP_ID=...
+
+# === WebSocket Server ===
+WS_SERVER_URL=wss://litmus-ws.onrender.com/ws
+
+# === Cron Secret ===
+CRON_SECRET=...
 ```
 
 ---
 
-## 11. Deployment (Vercel)
+## 11. Deployment (Render)
 
-### `next.config.ts`
+Render deployment is defined in `render.yaml` and provisions two services:
 
-```typescript
-import type { NextConfig } from "next";
+1. `litmus` (Node runtime) for the Next.js app.
+2. `litmus-ws` (Docker runtime) for `ws-server` and Plivo audio streaming.
 
-const nextConfig: NextConfig = {
-  // Turbopack is default in Next.js 16 — no opt-in needed
-  reactCompiler: true, // Stable in Next.js 16
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "**.supabase.co" },
-      { protocol: "https", hostname: "**.intercom.com" },
-    ],
-  },
-  serverExternalPackages: ["plivo"], // Plivo SDK needs Node.js native modules
-};
+`WS_SERVER_URL` must point to the ws-server endpoint (for example `wss://litmus-ws.onrender.com/ws`) so `/api/voice/answer` can build the `<Stream>` URL correctly.
 
-export default nextConfig;
+### `render.yaml` (source of truth)
+
+```yaml
+services:
+  - type: web
+    name: litmus
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+
+  - type: web
+    name: litmus-ws
+    runtime: docker
+    dockerfilePath: ./ws-server/Dockerfile
+    dockerContext: ./ws-server
 ```
 
-### WebSocket Limitation on Vercel
+### Render Cron Job
 
-Vercel's serverless functions do **not** natively support persistent WebSocket connections. For the Plivo audio streaming WebSocket, you have two options:
+Create a Render Cron Job that calls:
 
-**Option A (Recommended for hackathon): Separate WebSocket server**
-
-Deploy a lightweight Fastify or Express WebSocket server on Railway, Render, or Fly.io. Point the Plivo `<Stream>` URL to this server. The WebSocket server communicates with the Next.js app via Supabase Realtime or direct API calls.
-
-**Option B: Vercel with `@vercel/node` and upgrade**
-
-Use a Vercel Serverless Function with manual WebSocket upgrade. This is experimental and may have timeout limitations (max 300s on Pro plan).
-
-**Recommendation:** For hackathon demo reliability, go with **Option A**. Deploy a `ws-server/` directory to Railway with a `Dockerfile`. This isolates the flaky WebSocket handling from the rest of the app.
-
-```
-litmus/
-├── ws-server/                 # Separate WebSocket server
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── src/
-│       └── index.ts           # Fastify + @fastify/websocket
-└── ...                        # Main Next.js app on Vercel
-```
-
-### Vercel Cron Jobs
-
-For periodic web intelligence gathering:
-
-```json
-// vercel.json
-{
-  "crons": [
-    {
-      "path": "/api/cron/intelligence",
-      "schedule": "0 */6 * * *"
-    }
-  ]
-}
-```
+- `GET https://litmus.onrender.com/api/cron/intelligence`
+- Header: `Authorization: Bearer <CRON_SECRET>`
 
 ---
 
@@ -1422,11 +1403,11 @@ For periodic web intelligence gathering:
 
 ## 13. Division of Labor (3-Person Team)
 
-| Person                           | Responsibilities                                                                                                         | Key Files                                                                                          |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| **Person A (Full-Stack Lead)**   | Next.js 16 setup, Supabase schema, auth, agent CRUD, deployment, proxy.ts                                                | `next.config.ts`, `src/app/`, `src/api/agents/`, `supabase/`                                       |
-| **Person B (Voice + Backend)**   | Plivo integration, WebSocket server, Gemini Live API audio pipeline, mulaw↔PCM conversion, post-call evaluation pipeline | `ws-server/`, `src/lib/plivo/`, `src/lib/gemini/live.ts`, `src/api/voice/`, `src/api/evaluate/`    |
-| **Person C (Intelligence + UI)** | You.com integration, Composio verification, Intercom metrics, comparison dashboard, Shadcn components, Recharts          | `src/lib/youcom/`, `src/lib/composio/`, `src/lib/intercom/`, `src/components/`, `src/app/compare/` |
+| Person                           | Responsibilities                                                                                                         | Key Files                                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| **Person A (Full-Stack Lead)**   | Next.js 16 setup, Supabase schema, auth, agent CRUD, Render deployment, middleware                                       | `next.config.ts`, `src/app/`, `src/app/api/agents/`, `middleware.ts`                                    |
+| **Person B (Voice + Backend)**   | Plivo integration, WebSocket server, Gemini Live API audio pipeline, mulaw↔PCM conversion, post-call evaluation pipeline | `ws-server/`, `src/lib/plivo/`, `src/lib/gemini/live.ts`, `src/app/api/voice/`, `src/app/api/evaluate/` |
+| **Person C (Intelligence + UI)** | You.com integration, Composio verification, Intercom metrics, comparison dashboard, Shadcn components, Recharts          | `src/lib/youcom/`, `src/lib/composio/`, `src/lib/intercom/`, `src/components/`, `src/app/compare/`      |
 
 ### Parallelization Strategy
 
@@ -1444,7 +1425,7 @@ For periodic web intelligence gathering:
 
 | Risk                                 | Probability | Impact   | Mitigation                                                                                                                                                                                              |
 | ------------------------------------ | ----------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Plivo WebSocket fails on Vercel      | High        | Critical | Deploy WebSocket server separately on Railway (Option A in §11)                                                                                                                                         |
+| Plivo WebSocket service outage       | High        | Critical | Deploy `litmus-ws` separately on Render (Docker), configure health checks, and keep `WS_SERVER_URL` pointed to the active service                                                                       |
 | Plivo number not provisioned in time | Medium      | Critical | Pre-provision number before hackathon day; have a fallback demo using a pre-recorded call                                                                                                               |
 | Gemini API rate limits               | Low         | Medium   | Use `gemini-2.5-flash` (generous free tier), batch evaluation requests                                                                                                                                  |
 | You.com API latency                  | Low         | Low      | Cache intelligence results in Supabase with 6-hour TTL                                                                                                                                                  |
@@ -1453,7 +1434,7 @@ For periodic web intelligence gathering:
 | Voice evaluation audio quality       | Medium      | Medium   | Use a quiet room for demo; have a pre-recorded evaluation as backup; Gemini Live API's built-in VAD helps filter noise                                                                                  |
 | Gemini Live API latency              | Medium      | High     | Native audio model is still in preview; test latency before demo day. Fallback: use `gemini-live-2.5-flash-preview` (half-cascade, text mode) with separate Gemini TTS (`gemini-2.5-flash-preview-tts`) |
 | Mulaw ↔ PCM conversion               | Low         | Medium   | Use `wavefile` npm package, well-tested; pre-validate conversion pipeline with a recorded Plivo call                                                                                                    |
-| Next.js 16 proxy.ts unfamiliarity    | Low         | Low      | Minimal proxy logic needed; fallback to route-level auth checks                                                                                                                                         |
+| Next.js middleware configuration gap | Low         | Low      | Keep route protection centralized in `middleware.ts` and validate protected matchers                                                                                                                    |
 
 ### Critical Pre-Hackathon Checklist
 
@@ -1464,9 +1445,9 @@ For periodic web intelligence gathering:
 - [ ] Composio account with test integrations pre-authenticated
 - [ ] Intercom development workspace created with seed conversation data
 - [ ] Supabase project created with schema migrated
-- [ ] Railway or Fly.io account for WebSocket server deployment
-- [ ] Vercel project linked to GitHub repo
-- [ ] All environment variables set in Vercel dashboard
+- [ ] Render account with both `litmus` and `litmus-ws` services configured
+- [ ] Render Blueprint linked to GitHub repo
+- [ ] All environment variables set in Render dashboard
 - [ ] ngrok installed for local WebSocket testing
 - [ ] Demo phone number tested with Plivo outbound calls
 

@@ -1,7 +1,12 @@
 import { z } from "zod/v4";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { evaluateBenchmark } from "@/lib/gemini/judge";
-import { handleApiError, validateWithZod, NotFoundError } from "@/lib/utils/errors";
+import {
+  handleApiError,
+  validateWithZod,
+  NotFoundError,
+  ValidationError,
+} from "@/lib/utils/errors";
 import { BENCHMARK_TYPES } from "@/lib/utils/constants";
 import type { BenchmarkType } from "@/types/benchmark";
 
@@ -11,12 +16,14 @@ import type { BenchmarkType } from "@/types/benchmark";
 
 const benchmarkRequestSchema = z.object({
   benchmark_type: z.enum(BENCHMARK_TYPES as [string, ...string[]]),
+  agent_response: z.string().min(1).optional(),
   custom_tasks: z
     .array(
       z.object({
         description: z.string(),
         input: z.unknown(),
         reference_answer: z.string().optional(),
+        agent_response: z.string().min(1).optional(),
       })
     )
     .optional(),
@@ -63,6 +70,105 @@ const DEFAULT_TASKS: Record<BenchmarkType, { description: string; input: unknown
   },
 };
 
+function extractTextFromResponsePayload(payload: unknown): string | undefined {
+  if (typeof payload === "string" && payload.trim().length > 0) {
+    return payload.trim();
+  }
+
+  if (!payload || typeof payload !== "object") {
+    return undefined;
+  }
+
+  const data = payload as Record<string, unknown>;
+  const directTextKeys = ["response", "answer", "output", "text", "content", "message"];
+
+  for (const key of directTextKeys) {
+    const value = data[key];
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value.trim();
+    }
+  }
+
+  const choices = data.choices;
+  if (Array.isArray(choices) && choices.length > 0) {
+    const firstChoice = choices[0] as Record<string, unknown>;
+    if (typeof firstChoice.text === "string" && firstChoice.text.trim().length > 0) {
+      return firstChoice.text.trim();
+    }
+
+    const message = firstChoice.message;
+    if (message && typeof message === "object") {
+      const content = (message as Record<string, unknown>).content;
+      if (typeof content === "string" && content.trim().length > 0) {
+        return content.trim();
+      }
+    }
+  }
+
+  return undefined;
+}
+
+async function fetchAgentResponseFromEndpoint(params: {
+  apiEndpoint: string;
+  benchmarkType: BenchmarkType;
+  taskDescription: string;
+  taskInput: unknown;
+}): Promise<string> {
+  let endpoint: URL;
+  try {
+    endpoint = new URL(params.apiEndpoint);
+  } catch {
+    throw new ValidationError("Agent API endpoint is not a valid URL");
+  }
+
+  if (!["http:", "https:"].includes(endpoint.protocol)) {
+    throw new ValidationError("Agent API endpoint must use http:// or https://");
+  }
+
+  const response = await fetch(endpoint.toString(), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json, text/plain;q=0.9, */*;q=0.8",
+    },
+    body: JSON.stringify({
+      benchmark_type: params.benchmarkType,
+      task_description: params.taskDescription,
+      input: params.taskInput,
+    }),
+    signal: AbortSignal.timeout(30_000),
+  });
+
+  if (!response.ok) {
+    const responseText = await response.text();
+    const detail = responseText.slice(0, 500);
+    throw new ValidationError(
+      `Agent endpoint returned ${response.status} ${response.statusText}`,
+      detail
+    );
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    const payload = await response.json();
+    const responseText = extractTextFromResponsePayload(payload);
+    if (!responseText) {
+      throw new ValidationError(
+        "Unable to extract textual agent response from endpoint JSON payload",
+        payload
+      );
+    }
+    return responseText;
+  }
+
+  const rawText = (await response.text()).trim();
+  if (!rawText) {
+    throw new ValidationError("Agent endpoint returned an empty response body");
+  }
+
+  return rawText;
+}
+
 // ---------------------------------------------------------------------------
 // POST /api/agents/[slug]/benchmark  -  Trigger a benchmark run
 // ---------------------------------------------------------------------------
@@ -82,7 +188,7 @@ export async function POST(
     // Fetch agent
     const { data: agent, error: agentError } = await supabase
       .from("agents")
-      .select("id, name")
+      .select("id, name, api_endpoint")
       .eq("slug", slug)
       .maybeSingle();
 
@@ -92,7 +198,32 @@ export async function POST(
     const benchmarkType = data.benchmark_type as BenchmarkType;
     const task = data.custom_tasks?.[0] ?? DEFAULT_TASKS[benchmarkType];
 
-    // Create a pending benchmark record
+    const providedAgentResponse = data.agent_response ?? data.custom_tasks?.[0]?.agent_response;
+    const agentResponse =
+      providedAgentResponse && providedAgentResponse.trim().length > 0
+        ? providedAgentResponse.trim()
+        : agent.api_endpoint
+          ? await fetchAgentResponseFromEndpoint({
+              apiEndpoint: agent.api_endpoint,
+              benchmarkType,
+              taskDescription: task.description,
+              taskInput: task.input,
+            })
+          : null;
+
+    if (!agentResponse) {
+      throw new ValidationError(
+        "No agent response source available. Provide agent_response in the request or configure api_endpoint for the agent."
+      );
+    }
+
+    const evaluation = await evaluateBenchmark(
+      task.description,
+      agentResponse,
+      benchmarkType,
+      (task as { reference_answer?: string }).reference_answer
+    );
+
     const { data: benchmark, error: insertError } = await serviceClient
       .from("benchmarks")
       .insert({
@@ -100,50 +231,37 @@ export async function POST(
         benchmark_type: benchmarkType,
         task_description: task.description,
         input_payload: (task.input ?? {}) as unknown as import("@/lib/supabase/types").Json,
-        scores: {} as unknown as import("@/lib/supabase/types").Json,
-        composite_score: 0,
+        agent_response: {
+          text: agentResponse,
+        } as unknown as import("@/lib/supabase/types").Json,
+        gemini_evaluation: evaluation as unknown as import("@/lib/supabase/types").Json,
+        scores: evaluation.scores as unknown as import("@/lib/supabase/types").Json,
+        composite_score: evaluation.composite_score,
       })
       .select()
       .single();
 
     if (insertError) throw insertError;
 
-    // Run evaluation asynchronously so we can return 202 immediately
-    (async () => {
-      try {
-        // For a real implementation the agent_response would come from
-        // calling the agent's API. Here we set a placeholder so the
-        // Gemini judge can still evaluate the task structure.
-        const agentResponse =
-          "The agent has not provided a response yet. Evaluate based on the task description alone.";
+    const { error: scoreUpdateError } = await serviceClient.rpc("update_agent_score", {
+      agent_uuid: agent.id,
+    });
 
-        const evaluation = await evaluateBenchmark(
-          task.description,
-          agentResponse,
-          benchmarkType,
-          (task as { reference_answer?: string }).reference_answer
-        );
+    if (scoreUpdateError) {
+      console.error("[benchmark] Failed to update aggregate score:", scoreUpdateError);
+    }
 
-        await serviceClient
-          .from("benchmarks")
-          .update({
-            agent_response: {
-              text: agentResponse,
-            } as unknown as import("@/lib/supabase/types").Json,
-            gemini_evaluation: evaluation as unknown as import("@/lib/supabase/types").Json,
-            scores: evaluation.scores as unknown as import("@/lib/supabase/types").Json,
-            composite_score: evaluation.composite_score,
-          })
-          .eq("id", benchmark.id);
-
-        // Recalculate the agent's overall score
-        await serviceClient.rpc("update_agent_score", { agent_uuid: agent.id });
-      } catch (e) {
-        console.error("[benchmark] Evaluation failed:", e);
-      }
-    })();
-
-    return Response.json({ benchmark_id: benchmark.id, status: "running" }, { status: 202 });
+    return Response.json(
+      {
+        id: benchmark.id,
+        benchmark_id: benchmark.id,
+        scores: evaluation.scores,
+        composite_score: evaluation.composite_score,
+        justifications: evaluation.justifications,
+        status: "complete",
+      },
+      { status: 201 }
+    );
   } catch (error) {
     return handleApiError(error);
   }

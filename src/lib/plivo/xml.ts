@@ -2,6 +2,7 @@ import plivo from "plivo";
 
 export function buildStreamResponse(params: {
   agentId: string;
+  agentName?: string;
   wsUrl: string;
   statusCallbackUrl: string;
 }): string {
@@ -14,7 +15,13 @@ export function buildStreamResponse(params: {
       "Say end evaluation when you are finished."
   );
 
-  const streamElement = plivoResponse.addStream(`${params.wsUrl}?agent_id=${params.agentId}`);
+  const streamUrl = new URL(params.wsUrl);
+  streamUrl.searchParams.set("agent_id", params.agentId);
+  if (params.agentName) {
+    streamUrl.searchParams.set("agent_name", params.agentName);
+  }
+
+  const streamElement = plivoResponse.addStream(streamUrl.toString());
   streamElement.addAttribute("keepCallAlive", "true");
   streamElement.addAttribute("bidirectional", "true");
   streamElement.addAttribute("contentType", "audio/x-mulaw;rate=8000");

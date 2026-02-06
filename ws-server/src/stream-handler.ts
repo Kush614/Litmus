@@ -32,7 +32,7 @@ export function handlePlivoStream(socket: WebSocket, req: FastifyRequest): void 
 
       switch (message.event) {
         case "start":
-          await handleStart(socket, message);
+          await handleStart(socket, req, message);
           break;
         case "media":
           await handleMedia(message);
@@ -75,6 +75,7 @@ export function handlePlivoStream(socket: WebSocket, req: FastifyRequest): void 
  */
 async function handleStart(
   socket: WebSocket,
+  req: FastifyRequest,
   message: {
     event: "start";
     start: {
@@ -89,14 +90,18 @@ async function handleStart(
 ): Promise<void> {
   const { streamId, callId } = message.start;
 
-  // Extract agentId from the WebSocket URL query params if available.
-  // Plivo passes through the original URL we configured in the <Stream> element.
-  const agentId = "default";
+  const requestProtocol = (req.headers["x-forwarded-proto"] as string | undefined) ?? "http";
+  const requestHost = req.headers.host ?? "localhost";
+  const requestUrl = req.raw.url ?? "/ws";
+
+  const parsedUrl = new URL(requestUrl, `${requestProtocol}://${requestHost}`);
+  const agentId = parsedUrl.searchParams.get("agent_id") ?? "unknown";
+  const agentName = parsedUrl.searchParams.get("agent_name") ?? undefined;
 
   console.log(`[StreamHandler] Stream started: streamId=${streamId}, callId=${callId}`);
 
   try {
-    const sessionData = await sessionManager.createSession(streamId, callId, agentId);
+    const sessionData = await sessionManager.createSession(streamId, callId, agentId, agentName);
 
     // Start the concurrent receive loop in the background.
     // This async function runs for the lifetime of the Gemini session,
@@ -168,14 +173,24 @@ async function handleStop(message: { event: "stop"; streamId: string }): Promise
   const litmusApiUrl = process.env.LITMUS_API_URL;
   if (litmusApiUrl && transcript.length > 0) {
     try {
+      const durationSeconds = Math.round((Date.now() - sessionData.startTime.getTime()) / 1000);
+      const normalizedTranscript = transcript.map((entry) => ({
+        role: entry.role,
+        text: entry.text,
+        timestamp: Number.isFinite(Date.parse(entry.timestamp))
+          ? Date.parse(entry.timestamp)
+          : Date.now(),
+      }));
+
       const response = await fetch(`${litmusApiUrl}/api/evaluate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          agentId: sessionData.agentId,
-          callId: sessionData.callId,
-          transcript,
-          durationSeconds: Math.round((Date.now() - sessionData.startTime.getTime()) / 1000),
+          type: "voice",
+          task_description: `Voice evaluation conversation for ${sessionData.agentName ?? `agent ${sessionData.agentId}`}`,
+          call_uuid: sessionData.callId,
+          duration_seconds: durationSeconds,
+          transcript: normalizedTranscript,
         }),
       });
 

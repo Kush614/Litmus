@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Litmus
 
-## Getting Started
+Litmus is an AI agent evaluation marketplace. It lets teams discover agents, run benchmark tasks, execute voice evaluations, and compare results with tool-verification and web-intelligence signals.
 
-First, run the development server:
+## Architecture
+
+The repository has two runtime services:
+
+- `src/` (Next.js 16 + React 19): web app + API routes (`src/app/api/**/route.ts`)
+- `ws-server/` (Fastify + WebSocket): Plivo audio stream bridge to Gemini Live API (`/ws`)
+
+Core integrations: Supabase (data/auth), Gemini (`@google/genai`), Plivo (voice), You.com (intelligence), Composio (tool verification), and Intercom (support metrics).
+
+## Local Development
+
+### 1) Install dependencies
+
+```bash
+npm install
+cd ws-server && npm install
+cd ..
+```
+
+### 2) Configure environment variables
+
+```bash
+cp .env.example .env
+cp ws-server/.env.example ws-server/.env
+```
+
+Populate all required keys in both files.
+
+### 3) Run both services
+
+Terminal 1:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Terminal 2:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd ws-server
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Web app runs on `http://localhost:3000`. WS server listens on `http://localhost:8080` and exposes `ws://localhost:8080/ws`.
 
-## Learn More
+## Commands
 
-To learn more about Next.js, take a look at the following resources:
+Main app (`package.json`):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev`: start Next.js dev server
+- `npm run build`: production build
+- `npm run start`: run built app
+- `npm run lint`: ESLint + Prettier check
+- `npm run format`: Prettier write
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+WS server (`ws-server/package.json`):
 
-## Deploy on Vercel
+- `npm run dev`: `tsx` watch mode
+- `npm run build`: TypeScript compile to `dist/`
+- `npm run start`: run compiled server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment (Render)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deployment is standardized on Render using `render.yaml`:
+
+- `litmus` (Node web service): builds/runs the Next.js app
+- `litmus-ws` (Docker web service): builds/runs `ws-server`
+
+Set all environment variables from `.env.example` and `ws-server/.env.example` in Render. `WS_SERVER_URL` must point to the deployed WS service URL (for example `wss://litmus-ws.onrender.com/ws`).
+
+For scheduled intelligence refresh, configure a Render Cron Job to call:
+
+- `GET /api/cron/intelligence`
+- Header: `Authorization: Bearer <CRON_SECRET>`

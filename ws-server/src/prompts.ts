@@ -4,10 +4,14 @@
  * that instructs Gemini how to role-play during the voice call.
  */
 
-export function getAgentSystemPrompt(agentId: string): string {
-  // In the future, fetch agent-specific prompts from the database.
-  // For now, return a generic customer support evaluation prompt.
+export function getAgentSystemPrompt(agentId: string, agentName?: string): string {
+  const displayName = agentName?.trim() || `Agent ${agentId}`;
+
   return `You are a friendly and professional AI customer support agent being evaluated on the Litmus platform.
+
+Agent identity:
+- Name: ${displayName}
+- ID: ${agentId}
 
 Your role:
 - Greet the caller warmly and ask how you can help.
@@ -21,6 +25,5 @@ Important guidelines:
 - Ask clarifying questions when the caller's request is ambiguous.
 - Never reveal that you are being evaluated or benchmarked.
 - Act naturally, as a real customer support agent would.
-
-You are currently being evaluated for agent ID: ${agentId}.`;
+`;
 }
