@@ -95,14 +95,18 @@ function LoginForm() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Check your email</CardTitle>
           <p className="text-sm text-muted-foreground">
-            We sent a magic link to <strong>{email}</strong>. Click the link in the email to sign in.
+            We sent a magic link to <strong>{email}</strong>. Click the link in the email to sign
+            in.
           </p>
         </CardHeader>
         <CardContent>
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => { setMagicLinkSent(false); setMode("magic-link"); }}
+            onClick={() => {
+              setMagicLinkSent(false);
+              setMode("magic-link");
+            }}
           >
             Try again
           </Button>
@@ -115,7 +119,11 @@ function LoginForm() {
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">
-          {mode === "login" ? "Sign in to Litmus" : mode === "signup" ? "Create an account" : "Sign in with Magic Link"}
+          {mode === "login"
+            ? "Sign in to Litmus"
+            : mode === "signup"
+              ? "Create an account"
+              : "Sign in with Magic Link"}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           {mode === "login"
@@ -162,11 +170,7 @@ function LoginForm() {
               disabled={loading}
             />
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading
-                ? "Loading..."
-                : mode === "login"
-                  ? "Sign In"
-                  : "Sign Up"}
+              {loading ? "Loading..." : mode === "login" ? "Sign In" : "Sign Up"}
             </Button>
           </form>
         )}
@@ -178,7 +182,10 @@ function LoginForm() {
               <button
                 type="button"
                 className="underline hover:text-foreground"
-                onClick={() => { setMode("signup"); setError(""); }}
+                onClick={() => {
+                  setMode("signup");
+                  setError("");
+                }}
               >
                 Sign up
               </button>
@@ -186,7 +193,10 @@ function LoginForm() {
               <button
                 type="button"
                 className="underline hover:text-foreground"
-                onClick={() => { setMode("magic-link"); setError(""); }}
+                onClick={() => {
+                  setMode("magic-link");
+                  setError("");
+                }}
               >
                 Magic link
               </button>
@@ -197,7 +207,10 @@ function LoginForm() {
               <button
                 type="button"
                 className="underline hover:text-foreground"
-                onClick={() => { setMode("login"); setError(""); }}
+                onClick={() => {
+                  setMode("login");
+                  setError("");
+                }}
               >
                 Sign in
               </button>
@@ -207,7 +220,10 @@ function LoginForm() {
               <button
                 type="button"
                 className="underline hover:text-foreground"
-                onClick={() => { setMode("login"); setError(""); }}
+                onClick={() => {
+                  setMode("login");
+                  setError("");
+                }}
               >
                 Sign in with password
               </button>

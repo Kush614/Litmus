@@ -449,6 +449,7 @@ export type ToolVerification = Database["public"]["Tables"]["tool_verifications"
 export type UserReview = Database["public"]["Tables"]["user_reviews"]["Row"];
 export type UserReviewInsert = Database["public"]["Tables"]["user_reviews"]["Insert"];
 export type DiscoveryCandidateRow = Database["public"]["Tables"]["discovery_candidates"]["Row"];
-export type DiscoveryCandidateInsert = Database["public"]["Tables"]["discovery_candidates"]["Insert"];
+export type DiscoveryCandidateInsert =
+  Database["public"]["Tables"]["discovery_candidates"]["Insert"];
 export type DiscoverySessionRow = Database["public"]["Tables"]["discovery_sessions"]["Row"];
 export type DiscoverySessionInsert = Database["public"]["Tables"]["discovery_sessions"]["Insert"];

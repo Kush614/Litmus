@@ -3,7 +3,12 @@ import { createServerClient, createServiceRoleClient } from "@/lib/supabase/serv
 import { gatherIntelligence } from "@/lib/youcom/intelligence";
 import { generateAgentProfile } from "@/lib/gemini/profiler";
 import { after } from "next/server";
-import { handleApiError, validateWithZod, ValidationError, UnauthorizedError } from "@/lib/utils/errors";
+import {
+  handleApiError,
+  validateWithZod,
+  ValidationError,
+  UnauthorizedError,
+} from "@/lib/utils/errors";
 import { AGENT_CATEGORIES, DEFAULT_PAGE_SIZE } from "@/lib/utils/constants";
 import type { AgentCategory } from "@/types/agent";
 
@@ -110,7 +115,12 @@ export async function GET(request: Request): Promise<Response> {
     }
 
     // Standard filtered query
-    let queryBuilder = supabase.from("agents").select("id, slug, name, vendor, category, overall_score, total_evaluations, capabilities, created_at", { count: "exact" });
+    let queryBuilder = supabase
+      .from("agents")
+      .select(
+        "id, slug, name, vendor, category, overall_score, total_evaluations, capabilities, created_at",
+        { count: "exact" }
+      );
 
     if (category) {
       queryBuilder = queryBuilder.eq("category", category);

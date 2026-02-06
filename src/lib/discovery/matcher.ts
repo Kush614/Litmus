@@ -75,21 +75,28 @@ Only include tools with relevance_score >= 0.3. Be honest - if a tool doesn't fi
   // Merge Gemini ranking with candidate data
   return ranked
     .filter((r: { relevance_score: number }) => r.relevance_score >= 0.3)
-    .map((r: { candidate_id: string; relevance_score: number; feature_match: string[]; missing_features: string[] }) => {
-      const candidate = candidates.find((c: DiscoveryCandidateRow) => c.id === r.candidate_id);
-      if (!candidate) return null;
-      return {
-        candidate_id: candidate.id,
-        name: candidate.name,
-        vendor: candidate.vendor,
-        website_url: candidate.website_url,
-        description: candidate.description,
-        relevance_score: r.relevance_score,
-        feature_match: r.feature_match ?? [],
-        missing_features: r.missing_features ?? [],
-        capabilities: candidate.capabilities,
-      };
-    })
+    .map(
+      (r: {
+        candidate_id: string;
+        relevance_score: number;
+        feature_match: string[];
+        missing_features: string[];
+      }) => {
+        const candidate = candidates.find((c: DiscoveryCandidateRow) => c.id === r.candidate_id);
+        if (!candidate) return null;
+        return {
+          candidate_id: candidate.id,
+          name: candidate.name,
+          vendor: candidate.vendor,
+          website_url: candidate.website_url,
+          description: candidate.description,
+          relevance_score: r.relevance_score,
+          feature_match: r.feature_match ?? [],
+          missing_features: r.missing_features ?? [],
+          capabilities: candidate.capabilities,
+        };
+      }
+    )
     .filter(Boolean) as MatchedCandidate[];
 }
 
@@ -149,9 +156,7 @@ Return ONLY valid JSON array:
 
     // Update candidate capabilities in DB
     const supabase = createServiceRoleClient();
-    const supportedFeatures = results
-      .filter((r) => r.supported)
-      .map((r) => r.feature);
+    const supportedFeatures = results.filter((r) => r.supported).map((r) => r.feature);
 
     if (supportedFeatures.length > 0) {
       const { data: existing } = await supabase
@@ -160,9 +165,7 @@ Return ONLY valid JSON array:
         .eq("id", candidateId)
         .single();
 
-      const merged = [
-        ...new Set([...(existing?.capabilities ?? []), ...supportedFeatures]),
-      ];
+      const merged = [...new Set([...(existing?.capabilities ?? []), ...supportedFeatures])];
 
       await supabase
         .from("discovery_candidates")

@@ -26,7 +26,14 @@ export async function* streamDiscoveryChat(
 
   const contents = [
     { role: "user" as const, parts: [{ text: DISCOVERY_SYSTEM_PROMPT }] },
-    { role: "model" as const, parts: [{ text: "Understood. I'll help the user find the right AI agent tools by asking about their needs." }] },
+    {
+      role: "model" as const,
+      parts: [
+        {
+          text: "Understood. I'll help the user find the right AI agent tools by asking about their needs.",
+        },
+      ],
+    },
     ...conversationHistory.map((msg) => ({
       role: (msg.role === "assistant" ? "model" : "user") as "user" | "model",
       parts: [{ text: msg.content }],
@@ -54,9 +61,7 @@ export async function extractRequirements(
 ): Promise<ExtractedRequirements> {
   const ai = getGeminiClient();
 
-  const conversationText = conversationHistory
-    .map((m) => `[${m.role}]: ${m.content}`)
-    .join("\n");
+  const conversationText = conversationHistory.map((m) => `[${m.role}]: ${m.content}`).join("\n");
 
   const response = await ai.models.generateContent({
     model: MODELS.FLASH,
@@ -236,7 +241,11 @@ Return ONLY valid JSON:
 export async function generateFinalRecommendation(
   useCaseSummary: string,
   candidates: { id: string; name: string; description: string | null; avgScore: number }[],
-  allResults: { candidate_id: string; scores: Record<string, number>; justifications: Record<string, string> }[]
+  allResults: {
+    candidate_id: string;
+    scores: Record<string, number>;
+    justifications: Record<string, string>;
+  }[]
 ): Promise<{
   ranked_agents: {
     candidate_id: string;
@@ -303,7 +312,10 @@ Return ONLY valid JSON:
 
   // Ensure candidate_ids and scores are correct from our data
   const ranked = (parsed.ranked_agents ?? []).map(
-    (agent: { name: string; strengths: string[]; weaknesses: string[]; best_for: string }, idx: number) => {
+    (
+      agent: { name: string; strengths: string[]; weaknesses: string[]; best_for: string },
+      idx: number
+    ) => {
       const match = candidates.find((c) => c.name === agent.name);
       return {
         candidate_id: match?.id ?? "",

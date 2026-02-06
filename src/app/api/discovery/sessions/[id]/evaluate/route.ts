@@ -41,16 +41,15 @@ export async function POST(request: Request, { params }: RouteParams): Promise<R
       throw new ValidationError("No matched candidates to evaluate. Complete the chat first.");
     }
 
-    const requirements =
-      (session.extracted_requirements as unknown as ExtractedRequirements) ?? {
-        domain: "general",
-        pain_points: [],
-        required_features: [],
-        nice_to_have_features: [],
-        budget_tier: "medium" as const,
-        integration_needs: [],
-        team_size: null,
-      };
+    const requirements = (session.extracted_requirements as unknown as ExtractedRequirements) ?? {
+      domain: "general",
+      pain_points: [],
+      required_features: [],
+      nice_to_have_features: [],
+      budget_tier: "medium" as const,
+      integration_needs: [],
+      team_size: null,
+    };
 
     const history = (session.conversation_history ?? []) as unknown as ConversationMessage[];
     const useCaseSummary =
@@ -65,9 +64,7 @@ export async function POST(request: Request, { params }: RouteParams): Promise<R
     try {
       const body = await request.json();
       if (body.candidate_ids && Array.isArray(body.candidate_ids)) {
-        candidatesToEvaluate = matched.filter((c) =>
-          body.candidate_ids.includes(c.candidate_id)
-        );
+        candidatesToEvaluate = matched.filter((c) => body.candidate_ids.includes(c.candidate_id));
       }
     } catch {
       // No body or invalid JSON — evaluate all

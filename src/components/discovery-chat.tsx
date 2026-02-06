@@ -18,7 +18,16 @@ type DiscoveryChatProps = {
 type StreamEvent =
   | { type: "chunk"; content: string }
   | { type: "status"; content: string }
-  | { type: "matches"; content: string; candidates: { name: string; description: string | null; relevance_score: number; feature_match: string[] }[] }
+  | {
+      type: "matches";
+      content: string;
+      candidates: {
+        name: string;
+        description: string | null;
+        relevance_score: number;
+        feature_match: string[];
+      }[];
+    }
   | { type: "done" }
   | { type: "error"; content: string };
 
@@ -240,9 +249,7 @@ export function DiscoveryChat({
             >
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap ${
-                  msg.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
+                  msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
                 }`}
               >
                 {msg.content}
@@ -294,7 +301,8 @@ export function DiscoveryChat({
                   </div>
                   <p className="text-sm font-medium">Running personalized evaluation...</p>
                   <p className="text-xs text-muted-foreground">
-                    Generating custom test scenarios and evaluating each candidate. This may take a minute.
+                    Generating custom test scenarios and evaluating each candidate. This may take a
+                    minute.
                   </p>
                 </CardContent>
               </Card>
@@ -329,11 +337,7 @@ export function DiscoveryChat({
               Send
             </Button>
             {matches && matches.length > 0 && !isEvaluating && (
-              <Button
-                onClick={triggerEvaluation}
-                variant="secondary"
-                size="sm"
-              >
+              <Button onClick={triggerEvaluation} variant="secondary" size="sm">
                 Evaluate
               </Button>
             )}
@@ -344,9 +348,7 @@ export function DiscoveryChat({
       {/* Side Panel — Matched Candidates */}
       {matches && matches.length > 0 && (
         <div className="lg:w-80 shrink-0 space-y-3 overflow-y-auto">
-          <h3 className="font-semibold text-sm">
-            Matched AI Tools ({matches.length})
-          </h3>
+          <h3 className="font-semibold text-sm">Matched AI Tools ({matches.length})</h3>
           {matches.map((candidate, i) => (
             <Card key={i} className="p-3 space-y-2">
               <div className="flex items-start justify-between gap-2">

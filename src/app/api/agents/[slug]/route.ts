@@ -71,12 +71,17 @@ export async function GET(
 
       supabase
         .from("web_intelligence")
-        .select("id, source_type, source_url, title, summary, sentiment, relevance_score, fetched_at")
+        .select(
+          "id, source_type, source_url, title, summary, sentiment, relevance_score, fetched_at"
+        )
         .eq("agent_id", agent.id)
         .order("fetched_at", { ascending: false })
         .limit(20),
 
-      supabase.from("tool_verifications").select("id, tool_name, claimed, verified, verified_at").eq("agent_id", agent.id),
+      supabase
+        .from("tool_verifications")
+        .select("id, tool_name, claimed, verified, verified_at")
+        .eq("agent_id", agent.id),
     ]);
 
     return Response.json({
@@ -122,6 +127,7 @@ export async function PATCH(
     }
 
     // Build update payload (exclude submitted_by from the update)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { submitted_by: _submittedBy, ...updateFields } = data;
     const updatePayload: Record<string, unknown> = {
       ...updateFields,

@@ -80,7 +80,10 @@ export class LiveSession {
  * Transcription is enabled for both input and output so the server can
  * build a conversation transcript.
  */
-export async function createLiveSession(apiKey: string, systemPrompt: string): Promise<LiveSession> {
+export async function createLiveSession(
+  apiKey: string,
+  systemPrompt: string
+): Promise<LiveSession> {
   const ai = new GoogleGenAI({ apiKey });
 
   const liveSession = new LiveSession(null as unknown as Session);
@@ -149,7 +152,10 @@ export async function createLiveSession(apiKey: string, systemPrompt: string): P
 /**
  * Sends a chunk of PCM 16kHz audio to the Gemini Live session.
  */
-export async function sendAudioChunk(liveSession: LiveSession, pcm16kBuffer: Buffer): Promise<void> {
+export async function sendAudioChunk(
+  liveSession: LiveSession,
+  pcm16kBuffer: Buffer
+): Promise<void> {
   await liveSession.session.sendRealtimeInput({
     audio: {
       data: pcm16kBuffer.toString("base64"),

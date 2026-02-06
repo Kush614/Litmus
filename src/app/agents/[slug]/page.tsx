@@ -24,7 +24,9 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ s
   // Fetch the agent by slug
   const { data: agent, error: agentError } = await supabase
     .from("agents")
-    .select("id, slug, name, vendor, category, website_url, description, capabilities, integrations, overall_score")
+    .select(
+      "id, slug, name, vendor, category, website_url, description, capabilities, integrations, overall_score"
+    )
     .eq("slug", slug)
     .single();
 
@@ -64,7 +66,10 @@ export default async function AgentProfilePage({ params }: { params: Promise<{ s
       .eq("agent_id", agent.id)
       .order("fetched_at", { ascending: false })
       .limit(20),
-    supabase.from("tool_verifications").select("id, tool_name, claimed, verified, verified_at").eq("agent_id", agent.id),
+    supabase
+      .from("tool_verifications")
+      .select("id, tool_name, claimed, verified, verified_at")
+      .eq("agent_id", agent.id),
   ]);
 
   // Compute average scores from benchmarks

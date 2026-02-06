@@ -22,7 +22,7 @@ const server = Fastify({
 await server.register(websocket);
 
 // Health check endpoint for Render and monitoring
-server.get("/health", async (_request, _reply) => {
+server.get("/health", async () => {
   return { status: "ok" };
 });
 

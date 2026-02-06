@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // ws-server build output
+    "ws-server/dist/**",
   ]),
 ]);
 

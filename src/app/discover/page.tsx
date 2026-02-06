@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,11 +28,19 @@ export default function DiscoverPage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
 
-  useEffect(() => {
-    loadSessions();
+  const loadSession = useCallback(async (id: string) => {
+    const response = await fetch(`/api/discovery/sessions/${id}`);
+    if (!response.ok) return;
+    const data = await response.json();
+    const session = data.session;
+
+    setActiveSessionId(session.id);
+    setInitialHistory(session.conversation_history ?? []);
+    setInitialStatus(session.status);
+    setInitialMatches(session.matched_candidates ?? null);
   }, []);
 
-  async function loadSessions() {
+  const loadSessions = useCallback(async () => {
     try {
       const response = await fetch("/api/discovery/sessions");
       if (!response.ok) {
@@ -57,19 +65,11 @@ export default function DiscoverPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [router, loadSession]);
 
-  async function loadSession(id: string) {
-    const response = await fetch(`/api/discovery/sessions/${id}`);
-    if (!response.ok) return;
-    const data = await response.json();
-    const session = data.session;
-
-    setActiveSessionId(session.id);
-    setInitialHistory(session.conversation_history ?? []);
-    setInitialStatus(session.status);
-    setInitialMatches(session.matched_candidates ?? null);
-  }
+  useEffect(() => {
+    loadSessions();
+  }, [loadSessions]);
 
   async function createSession() {
     setCreating(true);
@@ -147,12 +147,10 @@ export default function DiscoverPage() {
     <div className="container mx-auto px-4 md:px-6 py-8">
       <div className="max-w-2xl mx-auto space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-3xl md:text-4xl font-bold">
-            Find Your Perfect AI Agent
-          </h1>
+          <h1 className="text-3xl md:text-4xl font-bold">Find Your Perfect AI Agent</h1>
           <p className="text-muted-foreground text-lg">
-            Describe your business problem and we&apos;ll research, evaluate, and
-            recommend the best AI tools for your specific use case.
+            Describe your business problem and we&apos;ll research, evaluate, and recommend the best
+            AI tools for your specific use case.
           </p>
           <div className="flex gap-3">
             <Button size="lg" onClick={createSession} disabled={creating}>
@@ -177,7 +175,8 @@ export default function DiscoverPage() {
             {
               step: "1",
               title: "Describe Your Needs",
-              description: "Chat with our AI consultant about your business challenges and requirements.",
+              description:
+                "Chat with our AI consultant about your business challenges and requirements.",
             },
             {
               step: "2",

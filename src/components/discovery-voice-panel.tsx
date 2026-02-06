@@ -84,8 +84,8 @@ export function DiscoveryVoicePanel({ onSessionCreated }: VoiceDiscoveryProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Prefer to talk? We&apos;ll call you and have a conversation to understand your
-          needs, then automatically search and evaluate AI tools for you.
+          Prefer to talk? We&apos;ll call you and have a conversation to understand your needs, then
+          automatically search and evaluate AI tools for you.
         </p>
 
         <div className="flex gap-3">
@@ -106,11 +106,7 @@ export function DiscoveryVoicePanel({ onSessionCreated }: VoiceDiscoveryProps) {
 
         <Badge
           variant={
-            status === "active"
-              ? "default"
-              : status === "error"
-                ? "destructive"
-                : "secondary"
+            status === "active" ? "default" : status === "error" ? "destructive" : "secondary"
           }
         >
           {status === "idle" && "Ready"}
@@ -122,8 +118,8 @@ export function DiscoveryVoicePanel({ onSessionCreated }: VoiceDiscoveryProps) {
         {status === "active" && sessionId && (
           <div className="p-4 bg-muted rounded-lg text-center space-y-2">
             <p className="text-sm">
-              Your phone should ring shortly. Describe your business problem and the AI
-              tools you&apos;re looking for.
+              Your phone should ring shortly. Describe your business problem and the AI tools
+              you&apos;re looking for.
             </p>
             <p className="text-xs text-muted-foreground">
               When the call ends, we&apos;ll automatically evaluate and recommend tools.
@@ -138,9 +134,7 @@ export function DiscoveryVoicePanel({ onSessionCreated }: VoiceDiscoveryProps) {
           </div>
         )}
 
-        {status === "error" && error && (
-          <p className="text-sm text-red-500">{error}</p>
-        )}
+        {status === "error" && error && <p className="text-sm text-red-500">{error}</p>}
       </CardContent>
     </Card>
   );

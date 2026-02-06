@@ -305,13 +305,9 @@ export async function enrichCandidate(candidateId: string): Promise<void> {
       .from("discovery_candidates")
       .update({
         description: profile.description || candidate.description,
-        capabilities: profile.capabilities?.length
-          ? profile.capabilities
-          : candidate.capabilities,
+        capabilities: profile.capabilities?.length ? profile.capabilities : candidate.capabilities,
         integrations: profile.integrations?.length ? profile.integrations : null,
-        pricing_model: profile.pricing_model
-          ? (profile.pricing_model as unknown as Json)
-          : null,
+        pricing_model: profile.pricing_model ? (profile.pricing_model as unknown as Json) : null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", candidateId);

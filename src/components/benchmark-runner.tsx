@@ -144,7 +144,8 @@ export function BenchmarkRunner({ agentSlug, hasApiEndpoint }: BenchmarkRunnerPr
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
-                Paste the agent&apos;s actual response to the task above, or use a sample to see the feature in action.
+                Paste the agent&apos;s actual response to the task above, or use a sample to see the
+                feature in action.
               </p>
               {sampleResponse && (
                 <Button

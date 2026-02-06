@@ -63,8 +63,7 @@ export const BENCHMARK_TYPE_LABELS: Record<BenchmarkType, string> = {
 };
 
 export const BENCHMARK_TASK_DESCRIPTIONS: Record<Exclude<BenchmarkType, "voice">, string> = {
-  text_qa:
-    "Answer 10 factual questions spanning geography, science, history, and current events.",
+  text_qa: "Answer 10 factual questions spanning geography, science, history, and current events.",
   support_sim:
     "Resolve a simulated customer support ticket about a billing discrepancy. Customer reports being charged twice for a monthly subscription of $29.99. They have a receipt showing the duplicate charge from 3 days ago.",
   tool_use:

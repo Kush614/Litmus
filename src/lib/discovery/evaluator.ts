@@ -7,7 +7,6 @@ import {
 import type {
   ExtractedRequirements,
   MatchedCandidate,
-  CustomScenario,
   ScenarioEvalResult,
   FinalRecommendation,
 } from "@/types/discovery";

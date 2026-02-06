@@ -145,14 +145,9 @@ export async function POST(request: Request, { params }: RouteParams): Promise<R
             );
           }
 
-          await serviceClient
-            .from("discovery_sessions")
-            .update(updatePayload)
-            .eq("id", id);
+          await serviceClient.from("discovery_sessions").update(updatePayload).eq("id", id);
 
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
-          );
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`));
           controller.close();
         } catch (e) {
           console.error("[discovery/chat] Streaming error:", e);

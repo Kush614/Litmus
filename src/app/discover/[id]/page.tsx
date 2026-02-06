@@ -50,8 +50,8 @@ export default async function DiscoveryResultsPage({ params }: PageProps) {
         <div className="max-w-2xl mx-auto text-center space-y-6">
           <h1 className="text-2xl font-bold">Evaluating Candidates...</h1>
           <p className="text-muted-foreground">
-            We&apos;re generating custom test scenarios and evaluating each candidate.
-            This typically takes 30-60 seconds.
+            We&apos;re generating custom test scenarios and evaluating each candidate. This
+            typically takes 30-60 seconds.
           </p>
           <div className="flex justify-center gap-1">
             <span className="w-3 h-3 bg-primary rounded-full animate-bounce" />
@@ -76,9 +76,7 @@ export default async function DiscoveryResultsPage({ params }: PageProps) {
         <div className="max-w-2xl mx-auto text-center space-y-4">
           <h1 className="text-2xl font-bold">Discovery Session</h1>
           <Badge variant="secondary">{session.status}</Badge>
-          <p className="text-muted-foreground">
-            This session hasn&apos;t been completed yet.
-          </p>
+          <p className="text-muted-foreground">This session hasn&apos;t been completed yet.</p>
           <Button asChild>
             <Link href="/discover">Back to Discovery</Link>
           </Button>

@@ -1,9 +1,5 @@
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
-import {
-  handleApiError,
-  UnauthorizedError,
-  NotFoundError,
-} from "@/lib/utils/errors";
+import { handleApiError, UnauthorizedError, NotFoundError } from "@/lib/utils/errors";
 
 type RouteParams = { params: Promise<{ id: string }> };
 

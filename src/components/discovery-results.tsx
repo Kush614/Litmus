@@ -214,29 +214,31 @@ export function DiscoveryResults({
                   </tr>
                 </thead>
                 <tbody>
-                  {["relevance", "capability_fit", "ease_of_integration", "value_for_money", "scalability"].map(
-                    (dim) => {
-                      const values = ranked.map(
-                        (a) => candidateAvgScores[a.candidate_id]?.[dim] ?? 0
-                      );
-                      const maxVal = Math.max(...values);
-                      return (
-                        <tr key={dim} className="border-b">
-                          <td className="py-2 pr-4 capitalize">
-                            {dim.replace(/_/g, " ")}
+                  {[
+                    "relevance",
+                    "capability_fit",
+                    "ease_of_integration",
+                    "value_for_money",
+                    "scalability",
+                  ].map((dim) => {
+                    const values = ranked.map(
+                      (a) => candidateAvgScores[a.candidate_id]?.[dim] ?? 0
+                    );
+                    const maxVal = Math.max(...values);
+                    return (
+                      <tr key={dim} className="border-b">
+                        <td className="py-2 pr-4 capitalize">{dim.replace(/_/g, " ")}</td>
+                        {ranked.map((a, i) => (
+                          <td
+                            key={a.candidate_id || a.name}
+                            className={`text-right py-2 px-2 ${values[i] === maxVal ? "font-semibold text-green-600" : ""}`}
+                          >
+                            {formatScore(values[i])}
                           </td>
-                          {ranked.map((a, i) => (
-                            <td
-                              key={a.candidate_id || a.name}
-                              className={`text-right py-2 px-2 ${values[i] === maxVal ? "font-semibold text-green-600" : ""}`}
-                            >
-                              {formatScore(values[i])}
-                            </td>
-                          ))}
-                        </tr>
-                      );
-                    }
-                  )}
+                        ))}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
