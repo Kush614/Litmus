@@ -13,7 +13,7 @@ export async function GET(
 ): Promise<Response> {
   try {
     const { slug } = await params;
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
 
     // Fetch the agent to get the ID, name, and vendor
     const { data: agent, error: agentError } = await supabase

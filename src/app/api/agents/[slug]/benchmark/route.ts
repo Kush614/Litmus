@@ -182,7 +182,7 @@ export async function POST(
     const body = await request.json();
     const data = validateWithZod(benchmarkRequestSchema, body);
 
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
     const serviceClient = createServiceRoleClient();
 
     // Fetch agent

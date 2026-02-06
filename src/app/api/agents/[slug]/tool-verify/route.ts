@@ -24,7 +24,7 @@ export async function POST(
     const body = await request.json();
     const data = validateWithZod(toolVerifySchema, body);
 
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
 
     // Fetch agent
     const { data: agent, error: agentError } = await supabase

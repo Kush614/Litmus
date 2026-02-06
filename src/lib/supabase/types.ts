@@ -6,6 +6,111 @@ export type Database = {
   };
   public: {
     Tables: {
+      discovery_candidates: {
+        Row: {
+          id: string;
+          name: string;
+          vendor: string;
+          website_url: string;
+          category: string;
+          description: string | null;
+          capabilities: string[] | null;
+          integrations: string[] | null;
+          pricing_model: Json | null;
+          yc_batch: string | null;
+          yc_company_url: string | null;
+          source: string;
+          is_active: boolean;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          vendor: string;
+          website_url: string;
+          category?: string;
+          description?: string | null;
+          capabilities?: string[] | null;
+          integrations?: string[] | null;
+          pricing_model?: Json | null;
+          yc_batch?: string | null;
+          yc_company_url?: string | null;
+          source?: string;
+          is_active?: boolean;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          vendor?: string;
+          website_url?: string;
+          category?: string;
+          description?: string | null;
+          capabilities?: string[] | null;
+          integrations?: string[] | null;
+          pricing_model?: Json | null;
+          yc_batch?: string | null;
+          yc_company_url?: string | null;
+          source?: string;
+          is_active?: boolean;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
+      discovery_sessions: {
+        Row: {
+          id: string;
+          user_id: string;
+          session_type: string;
+          use_case_summary: string | null;
+          extracted_requirements: Json | null;
+          conversation_history: Json;
+          matched_candidates: Json | null;
+          custom_scenarios: Json | null;
+          evaluation_results: Json | null;
+          final_recommendation: Json | null;
+          call_uuid: string | null;
+          status: string;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          session_type?: string;
+          use_case_summary?: string | null;
+          extracted_requirements?: Json | null;
+          conversation_history?: Json;
+          matched_candidates?: Json | null;
+          custom_scenarios?: Json | null;
+          evaluation_results?: Json | null;
+          final_recommendation?: Json | null;
+          call_uuid?: string | null;
+          status?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          session_type?: string;
+          use_case_summary?: string | null;
+          extracted_requirements?: Json | null;
+          conversation_history?: Json;
+          matched_candidates?: Json | null;
+          custom_scenarios?: Json | null;
+          evaluation_results?: Json | null;
+          final_recommendation?: Json | null;
+          call_uuid?: string | null;
+          status?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       agents: {
         Row: {
           api_endpoint: string | null;
@@ -343,3 +448,7 @@ export type WebIntelligence = Database["public"]["Tables"]["web_intelligence"]["
 export type ToolVerification = Database["public"]["Tables"]["tool_verifications"]["Row"];
 export type UserReview = Database["public"]["Tables"]["user_reviews"]["Row"];
 export type UserReviewInsert = Database["public"]["Tables"]["user_reviews"]["Insert"];
+export type DiscoveryCandidateRow = Database["public"]["Tables"]["discovery_candidates"]["Row"];
+export type DiscoveryCandidateInsert = Database["public"]["Tables"]["discovery_candidates"]["Insert"];
+export type DiscoverySessionRow = Database["public"]["Tables"]["discovery_sessions"]["Row"];
+export type DiscoverySessionInsert = Database["public"]["Tables"]["discovery_sessions"]["Insert"];

@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ModeToggle } from "@/components/mode-toggle";
 
 const NAV_LINKS = [
+  { href: "/discover", label: "Discover" },
   { href: "/agents", label: "Agents" },
   { href: "/compare", label: "Compare" },
   { href: "/submit", label: "Submit" },

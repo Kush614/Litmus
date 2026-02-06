@@ -70,7 +70,7 @@ export async function GET(request: Request): Promise<Response> {
     const rawParams = Object.fromEntries(url.searchParams.entries());
     const params = validateWithZod(searchParamsSchema, rawParams);
 
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
     const { page, per_page, sort_by, sort_order, query, category } = params;
     const offset = (page - 1) * per_page;
 
@@ -145,7 +145,7 @@ export async function POST(request: Request): Promise<Response> {
     // Authenticate the user
     const authHeader = request.headers.get("authorization");
     const token = authHeader?.replace("Bearer ", "");
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
 
     if (token) {
       const { data: userData, error: authError } = await supabase.auth.getUser(token);

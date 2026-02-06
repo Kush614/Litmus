@@ -34,7 +34,7 @@ export async function GET(
 ): Promise<Response> {
   try {
     const { slug } = await params;
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
 
     // Fetch agent record
     const { data: agent, error: agentError } = await supabase

@@ -15,7 +15,8 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "magic-link">("login");
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   const redirect = searchParams.get("redirect") ?? "/dashboard";
 
@@ -28,6 +29,27 @@ function LoginForm() {
       },
     });
     if (error) setError(error.message);
+  }
+
+  async function signInWithMagicLink(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const supabase = createBrowserClient();
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirect)}`,
+      },
+    });
+
+    setLoading(false);
+    if (error) {
+      setError(error.message);
+    } else {
+      setMagicLinkSent(true);
+    }
   }
 
   async function signInWithEmail(e: React.FormEvent) {
@@ -67,47 +89,87 @@ function LoginForm() {
     }
   }
 
+  if (magicLinkSent) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Check your email</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            We sent a magic link to <strong>{email}</strong>. Click the link in the email to sign in.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => { setMagicLinkSent(false); setMode("magic-link"); }}
+          >
+            Try again
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">
-          {mode === "login" ? "Sign in to Litmus" : "Create an account"}
+          {mode === "login" ? "Sign in to Litmus" : mode === "signup" ? "Create an account" : "Sign in with Magic Link"}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           {mode === "login"
             ? "Sign in to submit agents, run benchmarks, and write reviews."
-            : "Create an account to get started with Litmus."}
+            : mode === "signup"
+              ? "Create an account to get started with Litmus."
+              : "We\u2019ll send you a link to sign in instantly."}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
         {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
-        <form onSubmit={signInWithEmail} className="space-y-3">
-          <Input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={loading}
-          />
-          <Input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            disabled={loading}
-          />
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading
-              ? "Loading..."
-              : mode === "login"
-                ? "Sign In"
-                : "Sign Up"}
-          </Button>
-        </form>
+        {mode === "magic-link" ? (
+          <form onSubmit={signInWithMagicLink} className="space-y-3">
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Sending..." : "Send Magic Link"}
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={signInWithEmail} className="space-y-3">
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              disabled={loading}
+            />
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading
+                ? "Loading..."
+                : mode === "login"
+                  ? "Sign In"
+                  : "Sign Up"}
+            </Button>
+          </form>
+        )}
 
         <p className="text-center text-sm text-muted-foreground">
           {mode === "login" ? (
@@ -120,8 +182,16 @@ function LoginForm() {
               >
                 Sign up
               </button>
+              {" | "}
+              <button
+                type="button"
+                className="underline hover:text-foreground"
+                onClick={() => { setMode("magic-link"); setError(""); }}
+              >
+                Magic link
+              </button>
             </>
-          ) : (
+          ) : mode === "signup" ? (
             <>
               Already have an account?{" "}
               <button
@@ -130,6 +200,16 @@ function LoginForm() {
                 onClick={() => { setMode("login"); setError(""); }}
               >
                 Sign in
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="underline hover:text-foreground"
+                onClick={() => { setMode("login"); setError(""); }}
+              >
+                Sign in with password
               </button>
             </>
           )}

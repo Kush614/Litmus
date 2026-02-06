@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function VoiceEvalPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   const { data: agent } = await supabase
     .from("agents")

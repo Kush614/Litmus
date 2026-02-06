@@ -19,7 +19,7 @@ import type { AgentCategory } from "@/types/agent";
 
 export default async function AgentProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   // Fetch the agent by slug
   const { data: agent, error: agentError } = await supabase

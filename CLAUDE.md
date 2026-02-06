@@ -44,7 +44,7 @@ Litmus is an AI agent evaluation marketplace with three runtime components:
 
 ### Supabase Clients
 
-- `createServerClient()` — Cookie-based, uses anon key. For server components and API routes. **Not async** — do not `await` it.
+- `createServerClient()` — Cookie-based SSR client via `@supabase/ssr`. For server components and API routes. **Async** — always `await` it.
 - `createServiceRoleClient()` — Bypasses RLS. For backend operations (score updates, intelligence writes).
 - `createBrowserClient()` — For client components.
 
@@ -77,7 +77,7 @@ Weighted composites in `src/lib/utils/scoring.ts`:
 - Server pages using Supabase need `export const dynamic = "force-dynamic"` to avoid static prerender failures
 - `next/dynamic` with `ssr: false` cannot be used in Server Components — use a `"use client"` wrapper (see `score-radar-lazy.tsx`)
 - `useSearchParams()` must be inside a `<Suspense>` boundary
-- Middleware lives in `middleware.ts` at project root (not `proxy.ts`)
+- Proxy lives in `proxy.ts` at project root (Next.js 16 convention, replaces `middleware.ts`)
 
 ## Environment Variables
 

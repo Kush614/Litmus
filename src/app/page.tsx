@@ -8,7 +8,7 @@ import { createServerClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   const { data: topAgents } = await supabase
     .from("agents")
@@ -40,12 +40,12 @@ export default async function HomePage() {
           agents.
         </p>
         <div className="flex gap-3">
-          <Link href="/agents">
-            <Button size="lg">Browse Agents</Button>
+          <Link href="/discover">
+            <Button size="lg">Find Your AI Agent</Button>
           </Link>
-          <Link href="/submit">
+          <Link href="/agents">
             <Button variant="outline" size="lg">
-              Submit an Agent
+              Browse Agents
             </Button>
           </Link>
         </div>

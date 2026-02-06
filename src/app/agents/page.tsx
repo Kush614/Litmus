@@ -21,7 +21,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
   const sort_order = typeof params.sort_order === "string" ? params.sort_order : "desc";
   const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1;
 
-  const supabase = createServerClient();
+  const supabase = await createServerClient();
 
   // Build the base query
   let agentsQuery = supabase
