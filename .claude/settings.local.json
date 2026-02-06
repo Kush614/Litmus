@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd:*)",
+      "Bash([ -d \"src\" ])",
+      "Bash([ -d \"node_modules\" ])",
+      "Bash(git -C \"C:\\\\Users\\\\aritr\\\\Desktop\\\\GitHub Projects\\\\Litmus\" log --oneline --all)",
+      "WebSearch",
+      "mcp__plugin_supabase_supabase__list_projects",
+      "mcp__plugin_supabase_supabase__list_organizations",
+      "mcp__plugin_supabase_supabase__list_tables",
+      "mcp__plugin_supabase_supabase__list_migrations",
+      "mcp__plugin_supabase_supabase__get_project_url",
+      "mcp__plugin_supabase_supabase__get_publishable_keys",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --turbopack --src-dir --yes)",
+      "Bash(npx create-next-app@latest litmus-temp --typescript --tailwind --eslint --app --turbopack --src-dir --yes)",
+      "Bash(xcopy:*)",
+      "Bash(robocopy:*)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(npx shadcn@latest add button card input select table tabs badge dialog sheet separator avatar dropdown-menu command popover tooltip textarea label switch skeleton progress -y)",
+      "mcp__plugin_supabase_supabase__apply_migration",
+      "mcp__plugin_supabase_supabase__generate_typescript_types",
+      "mcp__plugin_supabase_supabase__get_advisors",
+      "mcp__plugin_supabase_supabase__execute_sql",
+      "Bash(npx next build)",
+      "Bash(npx eslint:*)",
+      "Bash(npx prettier --write .)",
+      "Bash(npm run lint)",
+      "Bash(npm run format:*)"
+    ]
+  }
+}

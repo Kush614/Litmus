@@ -56,15 +56,15 @@ The AI agent market is exploding — customer support bots, coding copilots, res
 
 **Litmus** is a marketplace and benchmarking platform for AI agents. It provides:
 
-| Capability | Description | Sponsor Tool |
-|---|---|---|
-| **Agent Profiles** | Structured, auto-populated agent profiles with capabilities, pricing, integrations, and changelog tracking | You.com Content API |
-| **Live Benchmarking** | Standardized evaluation tasks executed by Gemini-as-judge against submitted agents, producing comparable scores | Google Gemini API |
-| **Voice Evaluation** | Users can call a Plivo phone number, talk to an agent under test, and the system records structured quality metrics from the voice interaction | Plivo Audio Streaming |
-| **Real-Time Intelligence** | Continuous monitoring of agent changelogs, community sentiment, outage reports, and pricing changes via web search | You.com Search + News APIs |
-| **Tool Execution Verification** | Verify whether agents can actually perform claimed integrations (e.g., "creates Jira tickets") by testing through Composio | Composio |
-| **Support-Specific Metrics** | For Intercom Fin and other support agents, surface resolution rate, CSAT, and escalation data through the Intercom API | Intercom REST API |
-| **Comparison Dashboard** | Side-by-side agent comparison with radar charts, pricing calculators, and decision matrices | Shadcn UI + Recharts |
+| Capability                      | Description                                                                                                                                    | Sponsor Tool               |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| **Agent Profiles**              | Structured, auto-populated agent profiles with capabilities, pricing, integrations, and changelog tracking                                     | You.com Content API        |
+| **Live Benchmarking**           | Standardized evaluation tasks executed by Gemini-as-judge against submitted agents, producing comparable scores                                | Google Gemini API          |
+| **Voice Evaluation**            | Users can call a Plivo phone number, talk to an agent under test, and the system records structured quality metrics from the voice interaction | Plivo Audio Streaming      |
+| **Real-Time Intelligence**      | Continuous monitoring of agent changelogs, community sentiment, outage reports, and pricing changes via web search                             | You.com Search + News APIs |
+| **Tool Execution Verification** | Verify whether agents can actually perform claimed integrations (e.g., "creates Jira tickets") by testing through Composio                     | Composio                   |
+| **Support-Specific Metrics**    | For Intercom Fin and other support agents, surface resolution rate, CSAT, and escalation data through the Intercom API                         | Intercom REST API          |
+| **Comparison Dashboard**        | Side-by-side agent comparison with radar charts, pricing calculators, and decision matrices                                                    | Shadcn UI + Recharts       |
 
 ---
 
@@ -120,26 +120,26 @@ The AI agent market is exploding — customer support bots, coding copilots, res
 
 ### Core Framework
 
-| Layer | Technology | Version | Notes |
-|---|---|---|---|
-| **Framework** | Next.js | 16.x (latest stable) | App Router, Turbopack default, React 19.2, `proxy.ts` replaces `middleware.ts` |
-| **React** | React | 19.2 | View Transitions, `useEffectEvent`, Activity API |
-| **Language** | TypeScript | 5.6+ | Strict mode, `types` over `interfaces`, `undefined` over `null` |
-| **UI Library** | Shadcn UI | Latest | Radix primitives + Tailwind CSS |
-| **Charts** | Recharts | 2.x | Radar charts for agent comparison, line charts for longitudinal performance |
-| **Package Manager** | npm | 10.x | Per requirement |
-| **Deployment** | Vercel | — | Serverless functions + Edge (for proxy.ts) |
+| Layer               | Technology | Version              | Notes                                                                          |
+| ------------------- | ---------- | -------------------- | ------------------------------------------------------------------------------ |
+| **Framework**       | Next.js    | 16.x (latest stable) | App Router, Turbopack default, React 19.2, `proxy.ts` replaces `middleware.ts` |
+| **React**           | React      | 19.2                 | View Transitions, `useEffectEvent`, Activity API                               |
+| **Language**        | TypeScript | 5.6+                 | Strict mode, `types` over `interfaces`, `undefined` over `null`                |
+| **UI Library**      | Shadcn UI  | Latest               | Radix primitives + Tailwind CSS                                                |
+| **Charts**          | Recharts   | 2.x                  | Radar charts for agent comparison, line charts for longitudinal performance    |
+| **Package Manager** | npm        | 10.x                 | Per requirement                                                                |
+| **Deployment**      | Vercel     | —                    | Serverless functions + Edge (for proxy.ts)                                     |
 
 ### External Services
 
-| Service | Package / API | Purpose |
-|---|---|---|
-| **Supabase** | `@supabase/supabase-js` | Postgres DB, Auth (OAuth), Row Level Security, Realtime subscriptions |
-| **Google Gemini** | `@google/genai` (v1.40.0+) | LLM-as-judge for benchmarking, transcript evaluation, agent profile generation, **AND** real-time STT+TTS via Gemini Live API for voice evaluations |
-| **Plivo** | `plivo` (npm) + WebSocket | Voice agent evaluation via bidirectional audio streaming |
-| **You.com** | REST API (`api.ydc-index.io`) | Web search, content crawling, news monitoring for agent intelligence |
-| **Composio** | `@composio/core` (V3 SDK) | Tool execution verification across 850+ integrations |
-| **Intercom** | REST API (`api.intercom.io`) | Fin AI agent performance data, conversation analytics |
+| Service           | Package / API                 | Purpose                                                                                                                                             |
+| ----------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Supabase**      | `@supabase/supabase-js`       | Postgres DB, Auth (OAuth), Row Level Security, Realtime subscriptions                                                                               |
+| **Google Gemini** | `@google/genai` (v1.40.0+)    | LLM-as-judge for benchmarking, transcript evaluation, agent profile generation, **AND** real-time STT+TTS via Gemini Live API for voice evaluations |
+| **Plivo**         | `plivo` (npm) + WebSocket     | Voice agent evaluation via bidirectional audio streaming                                                                                            |
+| **You.com**       | REST API (`api.ydc-index.io`) | Web search, content crawling, news monitoring for agent intelligence                                                                                |
+| **Composio**      | `@composio/core` (V3 SDK)     | Tool execution verification across 850+ integrations                                                                                                |
+| **Intercom**      | REST API (`api.intercom.io`)  | Fin AI agent performance data, conversation analytics                                                                                               |
 
 ---
 
@@ -278,97 +278,97 @@ litmus/
 
 ### `agents`
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `uuid` | PK, default `gen_random_uuid()` | Unique agent identifier |
-| `slug` | `text` | UNIQUE, NOT NULL | URL-safe identifier (e.g., `intercom-fin-3`) |
-| `name` | `text` | NOT NULL | Display name |
-| `vendor` | `text` | NOT NULL | Company that builds the agent |
-| `description` | `text` | — | AI-generated summary from web intelligence |
-| `category` | `text` | NOT NULL | One of: `support`, `copilot`, `research`, `voice`, `design`, `general` |
-| `website_url` | `text` | — | Official product page |
-| `api_endpoint` | `text` | — | Public API endpoint (if available for testing) |
-| `pricing_model` | `jsonb` | — | Structured pricing data `{ type, base_cost, per_unit, unit }` |
-| `capabilities` | `text[]` | — | Array of capability tags |
-| `integrations` | `text[]` | — | Claimed third-party integrations |
-| `overall_score` | `numeric(4,2)` | — | Aggregate score (0–100), computed |
-| `total_evaluations` | `integer` | DEFAULT 0 | Count of completed evaluations |
-| `submitted_by` | `uuid` | FK → `auth.users` | User who submitted this agent |
-| `created_at` | `timestamptz` | DEFAULT `now()` | Creation timestamp |
-| `updated_at` | `timestamptz` | DEFAULT `now()` | Last update timestamp |
+| Column              | Type           | Constraints                     | Description                                                            |
+| ------------------- | -------------- | ------------------------------- | ---------------------------------------------------------------------- |
+| `id`                | `uuid`         | PK, default `gen_random_uuid()` | Unique agent identifier                                                |
+| `slug`              | `text`         | UNIQUE, NOT NULL                | URL-safe identifier (e.g., `intercom-fin-3`)                           |
+| `name`              | `text`         | NOT NULL                        | Display name                                                           |
+| `vendor`            | `text`         | NOT NULL                        | Company that builds the agent                                          |
+| `description`       | `text`         | —                               | AI-generated summary from web intelligence                             |
+| `category`          | `text`         | NOT NULL                        | One of: `support`, `copilot`, `research`, `voice`, `design`, `general` |
+| `website_url`       | `text`         | —                               | Official product page                                                  |
+| `api_endpoint`      | `text`         | —                               | Public API endpoint (if available for testing)                         |
+| `pricing_model`     | `jsonb`        | —                               | Structured pricing data `{ type, base_cost, per_unit, unit }`          |
+| `capabilities`      | `text[]`       | —                               | Array of capability tags                                               |
+| `integrations`      | `text[]`       | —                               | Claimed third-party integrations                                       |
+| `overall_score`     | `numeric(4,2)` | —                               | Aggregate score (0–100), computed                                      |
+| `total_evaluations` | `integer`      | DEFAULT 0                       | Count of completed evaluations                                         |
+| `submitted_by`      | `uuid`         | FK → `auth.users`               | User who submitted this agent                                          |
+| `created_at`        | `timestamptz`  | DEFAULT `now()`                 | Creation timestamp                                                     |
+| `updated_at`        | `timestamptz`  | DEFAULT `now()`                 | Last update timestamp                                                  |
 
 ### `benchmarks`
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `uuid` | PK | Unique benchmark identifier |
-| `agent_id` | `uuid` | FK → `agents.id`, NOT NULL | Agent being benchmarked |
-| `benchmark_type` | `text` | NOT NULL | `text_qa`, `tool_use`, `voice`, `support_sim`, `code_gen` |
-| `task_description` | `text` | NOT NULL | Natural language description of the benchmark task |
-| `input_payload` | `jsonb` | NOT NULL | The test input sent to the agent |
-| `agent_response` | `jsonb` | — | Raw agent response |
-| `gemini_evaluation` | `jsonb` | — | Structured evaluation from Gemini judge |
-| `scores` | `jsonb` | NOT NULL | `{ accuracy, coherence, helpfulness, hallucination, latency }` |
-| `composite_score` | `numeric(4,2)` | NOT NULL | Weighted composite (0–100) |
-| `evaluated_by` | `uuid` | FK → `auth.users` | User who triggered the benchmark |
-| `created_at` | `timestamptz` | DEFAULT `now()` | — |
+| Column              | Type           | Constraints                | Description                                                    |
+| ------------------- | -------------- | -------------------------- | -------------------------------------------------------------- |
+| `id`                | `uuid`         | PK                         | Unique benchmark identifier                                    |
+| `agent_id`          | `uuid`         | FK → `agents.id`, NOT NULL | Agent being benchmarked                                        |
+| `benchmark_type`    | `text`         | NOT NULL                   | `text_qa`, `tool_use`, `voice`, `support_sim`, `code_gen`      |
+| `task_description`  | `text`         | NOT NULL                   | Natural language description of the benchmark task             |
+| `input_payload`     | `jsonb`        | NOT NULL                   | The test input sent to the agent                               |
+| `agent_response`    | `jsonb`        | —                          | Raw agent response                                             |
+| `gemini_evaluation` | `jsonb`        | —                          | Structured evaluation from Gemini judge                        |
+| `scores`            | `jsonb`        | NOT NULL                   | `{ accuracy, coherence, helpfulness, hallucination, latency }` |
+| `composite_score`   | `numeric(4,2)` | NOT NULL                   | Weighted composite (0–100)                                     |
+| `evaluated_by`      | `uuid`         | FK → `auth.users`          | User who triggered the benchmark                               |
+| `created_at`        | `timestamptz`  | DEFAULT `now()`            | —                                                              |
 
 ### `voice_evaluations`
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `uuid` | PK | Unique evaluation identifier |
-| `agent_id` | `uuid` | FK → `agents.id`, NOT NULL | Agent evaluated |
-| `call_uuid` | `text` | NOT NULL | Plivo call UUID |
-| `stream_id` | `text` | — | Plivo audio stream identifier |
-| `transcript` | `jsonb` | — | Full conversation transcript `[{ role, text, timestamp }]` |
-| `duration_seconds` | `integer` | — | Call duration |
-| `audio_url` | `text` | — | Supabase Storage URL for recorded audio |
-| `gemini_evaluation` | `jsonb` | — | Gemini's evaluation of the voice interaction |
-| `scores` | `jsonb` | — | `{ naturalness, helpfulness, latency, accuracy, tone }` |
-| `composite_score` | `numeric(4,2)` | — | Weighted composite (0–100) |
-| `evaluated_by` | `uuid` | FK → `auth.users`, NOT NULL | Evaluator |
-| `created_at` | `timestamptz` | DEFAULT `now()` | — |
+| Column              | Type           | Constraints                 | Description                                                |
+| ------------------- | -------------- | --------------------------- | ---------------------------------------------------------- |
+| `id`                | `uuid`         | PK                          | Unique evaluation identifier                               |
+| `agent_id`          | `uuid`         | FK → `agents.id`, NOT NULL  | Agent evaluated                                            |
+| `call_uuid`         | `text`         | NOT NULL                    | Plivo call UUID                                            |
+| `stream_id`         | `text`         | —                           | Plivo audio stream identifier                              |
+| `transcript`        | `jsonb`        | —                           | Full conversation transcript `[{ role, text, timestamp }]` |
+| `duration_seconds`  | `integer`      | —                           | Call duration                                              |
+| `audio_url`         | `text`         | —                           | Supabase Storage URL for recorded audio                    |
+| `gemini_evaluation` | `jsonb`        | —                           | Gemini's evaluation of the voice interaction               |
+| `scores`            | `jsonb`        | —                           | `{ naturalness, helpfulness, latency, accuracy, tone }`    |
+| `composite_score`   | `numeric(4,2)` | —                           | Weighted composite (0–100)                                 |
+| `evaluated_by`      | `uuid`         | FK → `auth.users`, NOT NULL | Evaluator                                                  |
+| `created_at`        | `timestamptz`  | DEFAULT `now()`             | —                                                          |
 
 ### `web_intelligence`
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `uuid` | PK | — |
-| `agent_id` | `uuid` | FK → `agents.id`, NOT NULL | Target agent |
-| `source_type` | `text` | NOT NULL | `changelog`, `news`, `review`, `outage`, `pricing_change` |
-| `source_url` | `text` | NOT NULL | Original source URL |
-| `title` | `text` | NOT NULL | Article/event title |
-| `summary` | `text` | NOT NULL | Gemini-generated summary |
-| `sentiment` | `text` | — | `positive`, `neutral`, `negative` |
-| `relevance_score` | `numeric(3,2)` | — | 0.0–1.0 relevance score |
-| `raw_data` | `jsonb` | — | Raw You.com API response |
-| `fetched_at` | `timestamptz` | DEFAULT `now()` | — |
+| Column            | Type           | Constraints                | Description                                               |
+| ----------------- | -------------- | -------------------------- | --------------------------------------------------------- |
+| `id`              | `uuid`         | PK                         | —                                                         |
+| `agent_id`        | `uuid`         | FK → `agents.id`, NOT NULL | Target agent                                              |
+| `source_type`     | `text`         | NOT NULL                   | `changelog`, `news`, `review`, `outage`, `pricing_change` |
+| `source_url`      | `text`         | NOT NULL                   | Original source URL                                       |
+| `title`           | `text`         | NOT NULL                   | Article/event title                                       |
+| `summary`         | `text`         | NOT NULL                   | Gemini-generated summary                                  |
+| `sentiment`       | `text`         | —                          | `positive`, `neutral`, `negative`                         |
+| `relevance_score` | `numeric(3,2)` | —                          | 0.0–1.0 relevance score                                   |
+| `raw_data`        | `jsonb`        | —                          | Raw You.com API response                                  |
+| `fetched_at`      | `timestamptz`  | DEFAULT `now()`            | —                                                         |
 
 ### `tool_verifications`
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `uuid` | PK | — |
-| `agent_id` | `uuid` | FK → `agents.id`, NOT NULL | — |
-| `tool_name` | `text` | NOT NULL | e.g., `GITHUB`, `SLACK`, `JIRA` |
-| `claimed` | `boolean` | NOT NULL | Whether the agent claims this integration |
-| `verified` | `boolean` | — | Whether Composio could confirm it works |
-| `verification_details` | `jsonb` | — | Composio execution log |
-| `verified_at` | `timestamptz` | — | — |
+| Column                 | Type          | Constraints                | Description                               |
+| ---------------------- | ------------- | -------------------------- | ----------------------------------------- |
+| `id`                   | `uuid`        | PK                         | —                                         |
+| `agent_id`             | `uuid`        | FK → `agents.id`, NOT NULL | —                                         |
+| `tool_name`            | `text`        | NOT NULL                   | e.g., `GITHUB`, `SLACK`, `JIRA`           |
+| `claimed`              | `boolean`     | NOT NULL                   | Whether the agent claims this integration |
+| `verified`             | `boolean`     | —                          | Whether Composio could confirm it works   |
+| `verification_details` | `jsonb`       | —                          | Composio execution log                    |
+| `verified_at`          | `timestamptz` | —                          | —                                         |
 
 ### `user_reviews`
 
-| Column | Type | Constraints | Description |
-|---|---|---|---|
-| `id` | `uuid` | PK | — |
-| `agent_id` | `uuid` | FK → `agents.id`, NOT NULL | — |
-| `user_id` | `uuid` | FK → `auth.users`, NOT NULL | — |
-| `rating` | `integer` | CHECK 1–5, NOT NULL | Star rating |
-| `review_text` | `text` | — | Written review |
-| `use_case` | `text` | — | How they used the agent |
-| `verified_usage` | `boolean` | DEFAULT `false` | Whether usage was programmatically verified |
-| `created_at` | `timestamptz` | DEFAULT `now()` | — |
+| Column           | Type          | Constraints                 | Description                                 |
+| ---------------- | ------------- | --------------------------- | ------------------------------------------- |
+| `id`             | `uuid`        | PK                          | —                                           |
+| `agent_id`       | `uuid`        | FK → `agents.id`, NOT NULL  | —                                           |
+| `user_id`        | `uuid`        | FK → `auth.users`, NOT NULL | —                                           |
+| `rating`         | `integer`     | CHECK 1–5, NOT NULL         | Star rating                                 |
+| `review_text`    | `text`        | —                           | Written review                              |
+| `use_case`       | `text`        | —                           | How they used the agent                     |
+| `verified_usage` | `boolean`     | DEFAULT `false`             | Whether usage was programmatically verified |
+| `created_at`     | `timestamptz` | DEFAULT `now()`             | —                                           |
 
 ---
 
@@ -399,13 +399,13 @@ litmus/
 
 **Benchmark Categories:**
 
-| Category | Task Description | Scoring Dimensions |
-|---|---|---|
-| `text_qa` | Answer 10 factual questions from a standardized dataset | Accuracy, Coherence, Hallucination Rate |
-| `support_sim` | Resolve 5 simulated customer support tickets | Resolution Quality, Empathy, Policy Adherence |
-| `tool_use` | Execute 3 tool calls (create issue, send message, query DB) | Success Rate, Correct Parameters, Error Handling |
-| `code_gen` | Generate code for 3 specified tasks | Correctness, Style, Documentation |
-| `voice` | (See §7.3) Evaluated from voice call transcripts | Naturalness, Helpfulness, Latency, Tone |
+| Category      | Task Description                                            | Scoring Dimensions                               |
+| ------------- | ----------------------------------------------------------- | ------------------------------------------------ |
+| `text_qa`     | Answer 10 factual questions from a standardized dataset     | Accuracy, Coherence, Hallucination Rate          |
+| `support_sim` | Resolve 5 simulated customer support tickets                | Resolution Quality, Empathy, Policy Adherence    |
+| `tool_use`    | Execute 3 tool calls (create issue, send message, query DB) | Success Rate, Correct Parameters, Error Handling |
+| `code_gen`    | Generate code for 3 specified tasks                         | Correctness, Style, Documentation                |
+| `voice`       | (See §7.3) Evaluated from voice call transcripts            | Naturalness, Helpfulness, Latency, Tone          |
 
 **Gemini-as-Judge Implementation:**
 
@@ -517,11 +517,11 @@ type PlivoStartEvent = {
   event: "start";
   start: {
     streamId: string;
-    callId: string;       // Plivo CallUUID
+    callId: string; // Plivo CallUUID
     accountId: string;
     from: string;
     to: string;
-    codec: string;        // "audio/x-mulaw"
+    codec: string; // "audio/x-mulaw"
   };
 };
 
@@ -529,9 +529,9 @@ type PlivoStartEvent = {
 type PlivoMediaEvent = {
   event: "media";
   media: {
-    contentType: string;  // "audio/x-mulaw"
-    sampleRate: number;   // 8000
-    payload: string;      // base64-encoded audio
+    contentType: string; // "audio/x-mulaw"
+    sampleRate: number; // 8000
+    payload: string; // base64-encoded audio
     timestamp: string;
   };
   streamId: string;
@@ -543,7 +543,7 @@ type PlivoPlayAudioEvent = {
   media: {
     contentType: "audio/x-mulaw";
     sampleRate: 8000;
-    payload: string;      // base64-encoded audio
+    payload: string; // base64-encoded audio
   };
 };
 
@@ -608,11 +608,11 @@ async function gatherIntelligence(agentName: string, agentVendor: string): Promi
 
 **You.com API Endpoints Used:**
 
-| Endpoint | Method | Base URL | Purpose |
-|---|---|---|---|
-| Search | `GET` | `https://api.ydc-index.io/v1/search` | Web + news results with snippets |
-| Content | `GET` | `https://api.ydc-index.io/v1/content` | Full page HTML/Markdown for deep analysis |
-| News | `GET` | `https://api.ydc-index.io/news` | Breaking news about agents and vendors |
+| Endpoint | Method | Base URL                              | Purpose                                   |
+| -------- | ------ | ------------------------------------- | ----------------------------------------- |
+| Search   | `GET`  | `https://api.ydc-index.io/v1/search`  | Web + news results with snippets          |
+| Content  | `GET`  | `https://api.ydc-index.io/v1/content` | Full page HTML/Markdown for deep analysis |
+| News     | `GET`  | `https://api.ydc-index.io/news`       | Breaking news about agents and vendors    |
 
 **Key Parameters:**
 
@@ -646,7 +646,7 @@ const composio = new Composio({
  */
 async function verifyToolClaim(
   agentId: string,
-  toolkitName: string  // e.g., "GITHUB", "SLACK", "JIRA"
+  toolkitName: string // e.g., "GITHUB", "SLACK", "JIRA"
 ): Promise<ToolVerificationResult> {
   const userId = `litmus-verify-${agentId}`;
 
@@ -665,9 +665,8 @@ async function verifyToolClaim(
 
   // Execute a read-only test action
   // (e.g., list repos for GITHUB, list channels for SLACK)
-  const testAction = tools.find((t) =>
-    t.name.toLowerCase().includes("list") ||
-    t.name.toLowerCase().includes("get")
+  const testAction = tools.find(
+    (t) => t.name.toLowerCase().includes("list") || t.name.toLowerCase().includes("get")
   );
 
   if (!testAction) {
@@ -698,13 +697,13 @@ async function verifyToolClaim(
 
 **Metrics Pulled:**
 
-| Metric | Intercom API Endpoint | Description |
-|---|---|---|
-| Resolution Rate | `GET /conversations` + filtering | % of conversations resolved without human escalation |
-| Avg. Response Time | `GET /conversations/{id}` | Time between customer message and agent response |
-| Escalation Rate | `GET /conversations` | % of conversations handed off to human agents |
-| Topic Distribution | `GET /conversations` with tags | What topics the agent handles most |
-| CSAT Scores | `GET /conversations` with ratings | Customer satisfaction from post-conversation surveys |
+| Metric             | Intercom API Endpoint             | Description                                          |
+| ------------------ | --------------------------------- | ---------------------------------------------------- |
+| Resolution Rate    | `GET /conversations` + filtering  | % of conversations resolved without human escalation |
+| Avg. Response Time | `GET /conversations/{id}`         | Time between customer message and agent response     |
+| Escalation Rate    | `GET /conversations`              | % of conversations handed off to human agents        |
+| Topic Distribution | `GET /conversations` with tags    | What topics the agent handles most                   |
+| CSAT Scores        | `GET /conversations` with ratings | Customer satisfaction from post-conversation surveys |
 
 **Intercom REST API Usage:**
 
@@ -769,13 +768,13 @@ const response = await fetch("https://api.intercom.io/conversations/search", {
 
 **Purpose:** Submit a new agent to the registry.
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `name` | `string` | Yes | Agent display name |
-| `vendor` | `string` | Yes | Company name |
-| `category` | `string` | Yes | One of the defined categories |
-| `website_url` | `string` | Yes | Official product URL |
-| `api_endpoint` | `string` | No | Public API endpoint for testing |
+| Parameter      | Type     | Required | Description                     |
+| -------------- | -------- | -------- | ------------------------------- |
+| `name`         | `string` | Yes      | Agent display name              |
+| `vendor`       | `string` | Yes      | Company name                    |
+| `category`     | `string` | Yes      | One of the defined categories   |
+| `website_url`  | `string` | Yes      | Official product URL            |
+| `api_endpoint` | `string` | No       | Public API endpoint for testing |
 
 **Response:** `201` with created agent object. Triggers async You.com crawl + Gemini profile generation.
 
@@ -785,10 +784,10 @@ const response = await fetch("https://api.intercom.io/conversations/search", {
 
 **Purpose:** Trigger a benchmarking run for an agent.
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `benchmark_type` | `string` | Yes | One of: `text_qa`, `support_sim`, `tool_use`, `code_gen` |
-| `custom_tasks` | `object[]` | No | Override default tasks with custom ones |
+| Parameter        | Type       | Required | Description                                              |
+| ---------------- | ---------- | -------- | -------------------------------------------------------- |
+| `benchmark_type` | `string`   | Yes      | One of: `text_qa`, `support_sim`, `tool_use`, `code_gen` |
+| `custom_tasks`   | `object[]` | No       | Override default tasks with custom ones                  |
 
 **Response:** `202 Accepted` with benchmark ID. Evaluation runs asynchronously. Client polls or uses Supabase Realtime subscription for results.
 
@@ -798,10 +797,10 @@ const response = await fetch("https://api.intercom.io/conversations/search", {
 
 **Purpose:** Start a voice evaluation call.
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `agent_id` | `string` | Yes | Agent to evaluate |
-| `phone_number` | `string` | Yes | User's phone number (E.164 format) |
+| Parameter      | Type     | Required | Description                        |
+| -------------- | -------- | -------- | ---------------------------------- |
+| `agent_id`     | `string` | Yes      | Agent to evaluate                  |
+| `phone_number` | `string` | Yes      | User's phone number (E.164 format) |
 
 **Implementation:**
 
@@ -813,20 +812,14 @@ export async function POST(request: Request): Promise<Response> {
 
   // Input validation
   if (!agent_id || !phone_number) {
-    return Response.json(
-      { error: "agent_id and phone_number are required" },
-      { status: 400 }
-    );
+    return Response.json({ error: "agent_id and phone_number are required" }, { status: 400 });
   }
 
-  const client = new plivo.Client(
-    process.env.PLIVO_AUTH_ID!,
-    process.env.PLIVO_AUTH_TOKEN!
-  );
+  const client = new plivo.Client(process.env.PLIVO_AUTH_ID!, process.env.PLIVO_AUTH_TOKEN!);
 
   const call = await client.calls.create(
-    process.env.PLIVO_PHONE_NUMBER!,   // from
-    phone_number,                       // to
+    process.env.PLIVO_PHONE_NUMBER!, // from
+    phone_number, // to
     `https://${process.env.VERCEL_URL}/api/voice/answer?agent_id=${agent_id}`,
     {
       answerMethod: "POST",
@@ -838,10 +831,13 @@ export async function POST(request: Request): Promise<Response> {
   // Store call metadata in Supabase
   // ...
 
-  return Response.json({
-    call_uuid: call.requestUuid,
-    status: "initiating",
-  }, { status: 201 });
+  return Response.json(
+    {
+      call_uuid: call.requestUuid,
+      status: "initiating",
+    },
+    { status: 201 }
+  );
 }
 ```
 
@@ -862,8 +858,8 @@ export async function POST(request: Request): Promise<Response> {
 
   plivoResponse.addSpeak(
     "Connected to Litmus voice evaluation. " +
-    "You will now speak with the AI agent. " +
-    "Say end evaluation when you are finished."
+      "You will now speak with the AI agent. " +
+      "Say end evaluation when you are finished."
   );
 
   const streamElement = plivoResponse.addStream(
@@ -927,20 +923,17 @@ npm install plivo
 import plivo from "plivo";
 
 // Environment variables: PLIVO_AUTH_ID, PLIVO_AUTH_TOKEN
-const client = new plivo.Client(
-  process.env.PLIVO_AUTH_ID!,
-  process.env.PLIVO_AUTH_TOKEN!
-);
+const client = new plivo.Client(process.env.PLIVO_AUTH_ID!, process.env.PLIVO_AUTH_TOKEN!);
 ```
 
 **Key APIs Used:**
 
-| API | Method | Endpoint | Purpose |
-|---|---|---|---|
-| Create Call | `client.calls.create()` | `POST /v1/Account/{auth_id}/Call/` | Initiate outbound call |
-| Get Call | `client.calls.get(uuid)` | `GET /v1/Account/{auth_id}/Call/{uuid}/` | Get call details |
-| Hangup Call | `client.calls.hangup(uuid)` | `DELETE /v1/Account/{auth_id}/Call/{uuid}/` | End a call |
-| Stream API | REST | `POST /v1/Account/{auth_id}/Call/{uuid}/Stream/` | Initiate audio stream via API |
+| API         | Method                      | Endpoint                                         | Purpose                       |
+| ----------- | --------------------------- | ------------------------------------------------ | ----------------------------- |
+| Create Call | `client.calls.create()`     | `POST /v1/Account/{auth_id}/Call/`               | Initiate outbound call        |
+| Get Call    | `client.calls.get(uuid)`    | `GET /v1/Account/{auth_id}/Call/{uuid}/`         | Get call details              |
+| Hangup Call | `client.calls.hangup(uuid)` | `DELETE /v1/Account/{auth_id}/Call/{uuid}/`      | End a call                    |
+| Stream API  | REST                        | `POST /v1/Account/{auth_id}/Call/{uuid}/Stream/` | Initiate audio stream via API |
 
 **Audio Format Conversion:** Plivo streams `audio/x-mulaw` at 8kHz, while Gemini Live API expects PCM 16-bit at 16kHz input and outputs PCM at 24kHz. The WebSocket server must perform real-time format conversion:
 
@@ -969,11 +962,11 @@ Use the `wavefile` npm package or a lightweight custom buffer converter for this
 
 **Endpoints:**
 
-| Endpoint | URL | Key Params |
-|---|---|---|
-| Search | `/v1/search` | `query`, `count`, `freshness`, `country`, `livecrawl`, `livecrawl_formats` |
-| Content | `/v1/content` | `url` |
-| News | `/news` | `query`, `count`, `freshness` |
+| Endpoint | URL           | Key Params                                                                 |
+| -------- | ------------- | -------------------------------------------------------------------------- |
+| Search   | `/v1/search`  | `query`, `count`, `freshness`, `country`, `livecrawl`, `livecrawl_formats` |
+| Content  | `/v1/content` | `url`                                                                      |
+| News     | `/news`       | `query`, `count`, `freshness`                                              |
 
 **Authentication:**
 
@@ -993,7 +986,7 @@ type YouSearchResponse = {
       title: string;
       description: string;
       snippets: string[];
-      page_age: string;       // ISO date
+      page_age: string; // ISO date
       thumbnail_url: string;
       favicon_url: string;
     }>;
@@ -1038,10 +1031,10 @@ const ai = new GoogleGenAI({
 
 ```typescript
 const response = await ai.models.generateContent({
-  model: "gemini-2.5-flash",     // Fast, cost-effective for judging
+  model: "gemini-2.5-flash", // Fast, cost-effective for judging
   contents: evaluationPrompt,
   config: {
-    responseMimeType: "application/json",  // Force JSON output
+    responseMimeType: "application/json", // Force JSON output
   },
 });
 
@@ -1069,33 +1062,37 @@ const response = await ai.models.generateContent({
   model: "gemini-2.5-flash",
   contents: "Verify this agent can create GitHub issues",
   config: {
-    tools: [{
-      functionDeclarations: [{
-        name: "verify_integration",
-        description: "Test whether an AI agent can perform a specific tool action",
-        parameters: {
-          type: "OBJECT",
-          properties: {
-            toolkit: { type: "STRING", description: "Integration name" },
-            action: { type: "STRING", description: "Action to verify" },
-            test_params: { type: "OBJECT", description: "Test parameters" },
+    tools: [
+      {
+        functionDeclarations: [
+          {
+            name: "verify_integration",
+            description: "Test whether an AI agent can perform a specific tool action",
+            parameters: {
+              type: "OBJECT",
+              properties: {
+                toolkit: { type: "STRING", description: "Integration name" },
+                action: { type: "STRING", description: "Action to verify" },
+                test_params: { type: "OBJECT", description: "Test parameters" },
+              },
+              required: ["toolkit", "action"],
+            },
           },
-          required: ["toolkit", "action"],
-        },
-      }],
-    }],
+        ],
+      },
+    ],
   },
 });
 ```
 
 **Model Selection:**
 
-| Model | Use Case | Rationale |
-|---|---|---|
-| `gemini-2.5-flash` | Benchmark evaluation, profile generation, transcript scoring | Fast, cheap, sufficient for structured judging tasks |
-| `gemini-2.5-pro` | Complex multi-agent comparison, nuanced recommendation generation | Higher reasoning capability for synthesis tasks |
-| `gemini-2.5-flash-native-audio-preview-12-2025` | Voice evaluation (real-time STT + TTS in one session) | Native audio model — replaces separate STT/TTS services entirely |
-| `gemini-2.5-flash-preview-tts` | Standalone TTS for non-realtime audio generation | High-quality speech synthesis with style/emotion control |
+| Model                                           | Use Case                                                          | Rationale                                                        |
+| ----------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `gemini-2.5-flash`                              | Benchmark evaluation, profile generation, transcript scoring      | Fast, cheap, sufficient for structured judging tasks             |
+| `gemini-2.5-pro`                                | Complex multi-agent comparison, nuanced recommendation generation | Higher reasoning capability for synthesis tasks                  |
+| `gemini-2.5-flash-native-audio-preview-12-2025` | Voice evaluation (real-time STT + TTS in one session)             | Native audio model — replaces separate STT/TTS services entirely |
+| `gemini-2.5-flash-preview-tts`                  | Standalone TTS for non-realtime audio generation                  | High-quality speech synthesis with style/emotion control         |
 
 **Gemini Live API (Voice Evaluation Pipeline):**
 
@@ -1120,12 +1117,12 @@ async function createLiveSession(agentSystemPrompt: string) {
     config: {
       responseModalities: [Modality.AUDIO],
       systemInstruction: agentSystemPrompt,
-      inputAudioTranscription: {},   // Enable input transcription
-      outputAudioTranscription: {},  // Enable output transcription
+      inputAudioTranscription: {}, // Enable input transcription
+      outputAudioTranscription: {}, // Enable output transcription
       speechConfig: {
         voiceConfig: {
           prebuiltVoiceConfig: {
-            voiceName: "Kore",  // Female voice, professional tone
+            voiceName: "Kore", // Female voice, professional tone
           },
         },
       },
@@ -1139,10 +1136,7 @@ async function createLiveSession(agentSystemPrompt: string) {
  * Sends a chunk of audio to the Gemini Live API session.
  * Audio must be PCM 16-bit, 16kHz mono.
  */
-async function sendAudioChunk(
-  session: LiveSession,
-  pcm16kBuffer: Buffer
-): Promise<void> {
+async function sendAudioChunk(session: LiveSession, pcm16kBuffer: Buffer): Promise<void> {
   await session.sendRealtimeInput({
     audio: {
       data: pcm16kBuffer,
@@ -1191,17 +1185,17 @@ async function* receiveMessages(session: LiveSession) {
 
 **Key Gemini Live API Specs:**
 
-| Parameter | Value |
-|---|---|
-| Input audio format | PCM 16-bit, 16kHz, mono |
-| Output audio format | PCM 16-bit, 24kHz, mono |
-| Context window | 128k tokens (native audio models) |
-| Built-in VAD | Yes (automatic voice activity detection) |
-| Barge-in support | Yes (user can interrupt agent mid-response) |
-| Affective dialog | Yes (adapts tone to user emotion, requires `v1alpha` API version) |
-| Transcription | Both input and output transcription available |
-| Available voices | 30+ HD voices (Kore, Puck, Charon, Fenrir, Aoede, Leda, Orus, Zephyr, etc.) |
-| Languages | 24 languages supported |
+| Parameter           | Value                                                                       |
+| ------------------- | --------------------------------------------------------------------------- |
+| Input audio format  | PCM 16-bit, 16kHz, mono                                                     |
+| Output audio format | PCM 16-bit, 24kHz, mono                                                     |
+| Context window      | 128k tokens (native audio models)                                           |
+| Built-in VAD        | Yes (automatic voice activity detection)                                    |
+| Barge-in support    | Yes (user can interrupt agent mid-response)                                 |
+| Affective dialog    | Yes (adapts tone to user emotion, requires `v1alpha` API version)           |
+| Transcription       | Both input and output transcription available                               |
+| Available voices    | 30+ HD voices (Kore, Puck, Charon, Fenrir, Aoede, Leda, Orus, Zephyr, etc.) |
+| Languages           | 24 languages supported                                                      |
 
 ---
 
@@ -1235,13 +1229,13 @@ const tools = await composio.tools.get(userId, {
 
 **Available Toolkit Categories (relevant subset):**
 
-| Category | Example Toolkits |
-|---|---|
-| Developer Tools | GITHUB, GITLAB, LINEAR, SENTRY |
-| Communication | SLACK, DISCORD, GMAIL, MICROSOFT_TEAMS |
-| Productivity | JIRA, NOTION, ASANA, TRELLO, CLICKUP |
-| CRM | HUBSPOT, SALESFORCE |
-| Data | GOOGLE_SHEETS, AIRTABLE, SUPABASE |
+| Category        | Example Toolkits                       |
+| --------------- | -------------------------------------- |
+| Developer Tools | GITHUB, GITLAB, LINEAR, SENTRY         |
+| Communication   | SLACK, DISCORD, GMAIL, MICROSOFT_TEAMS |
+| Productivity    | JIRA, NOTION, ASANA, TRELLO, CLICKUP   |
+| CRM             | HUBSPOT, SALESFORCE                    |
+| Data            | GOOGLE_SHEETS, AIRTABLE, SUPABASE      |
 
 **V3 SDK Breaking Changes Note:** The V3 SDK (released mid-2025) renames "entities" to "users", "integrations" to "auth configs", and "connected accounts" to "connections". Always use V3 patterns:
 
@@ -1274,20 +1268,20 @@ const headers = {
 
 **Key Endpoints:**
 
-| Endpoint | Method | Purpose |
-|---|---|---|
+| Endpoint                | Method | Purpose                           |
+| ----------------------- | ------ | --------------------------------- |
 | `/conversations/search` | `POST` | Search conversations with filters |
-| `/conversations/{id}` | `GET` | Get single conversation detail |
-| `/contacts` | `GET` | List contacts |
-| `/data_attributes` | `GET` | List custom data attributes |
-| `/tags` | `GET` | List tags for categorization |
+| `/conversations/{id}`   | `GET`  | Get single conversation detail    |
+| `/contacts`             | `GET`  | List contacts                     |
+| `/data_attributes`      | `GET`  | List custom data attributes       |
+| `/tags`                 | `GET`  | List tags for categorization      |
 
 **Regional Endpoints:**
 
-| Region | Base URL |
-|---|---|
-| US | `https://api.intercom.io` |
-| EU | `https://api.eu.intercom.io` |
+| Region    | Base URL                     |
+| --------- | ---------------------------- |
+| US        | `https://api.intercom.io`    |
+| EU        | `https://api.eu.intercom.io` |
 | Australia | `https://api.au.intercom.io` |
 
 ---
@@ -1331,14 +1325,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Turbopack is default in Next.js 16 — no opt-in needed
-  reactCompiler: true,   // Stable in Next.js 16
+  reactCompiler: true, // Stable in Next.js 16
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "**.supabase.co" },
       { protocol: "https", hostname: "**.intercom.com" },
     ],
   },
-  serverExternalPackages: ["plivo"],  // Plivo SDK needs Node.js native modules
+  serverExternalPackages: ["plivo"], // Plivo SDK needs Node.js native modules
 };
 
 export default nextConfig;
@@ -1428,11 +1422,11 @@ For periodic web intelligence gathering:
 
 ## 13. Division of Labor (3-Person Team)
 
-| Person | Responsibilities | Key Files |
-|---|---|---|
-| **Person A (Full-Stack Lead)** | Next.js 16 setup, Supabase schema, auth, agent CRUD, deployment, proxy.ts | `next.config.ts`, `src/app/`, `src/api/agents/`, `supabase/` |
-| **Person B (Voice + Backend)** | Plivo integration, WebSocket server, Gemini Live API audio pipeline, mulaw↔PCM conversion, post-call evaluation pipeline | `ws-server/`, `src/lib/plivo/`, `src/lib/gemini/live.ts`, `src/api/voice/`, `src/api/evaluate/` |
-| **Person C (Intelligence + UI)** | You.com integration, Composio verification, Intercom metrics, comparison dashboard, Shadcn components, Recharts | `src/lib/youcom/`, `src/lib/composio/`, `src/lib/intercom/`, `src/components/`, `src/app/compare/` |
+| Person                           | Responsibilities                                                                                                         | Key Files                                                                                          |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| **Person A (Full-Stack Lead)**   | Next.js 16 setup, Supabase schema, auth, agent CRUD, deployment, proxy.ts                                                | `next.config.ts`, `src/app/`, `src/api/agents/`, `supabase/`                                       |
+| **Person B (Voice + Backend)**   | Plivo integration, WebSocket server, Gemini Live API audio pipeline, mulaw↔PCM conversion, post-call evaluation pipeline | `ws-server/`, `src/lib/plivo/`, `src/lib/gemini/live.ts`, `src/api/voice/`, `src/api/evaluate/`    |
+| **Person C (Intelligence + UI)** | You.com integration, Composio verification, Intercom metrics, comparison dashboard, Shadcn components, Recharts          | `src/lib/youcom/`, `src/lib/composio/`, `src/lib/intercom/`, `src/components/`, `src/app/compare/` |
 
 ### Parallelization Strategy
 
@@ -1448,18 +1442,18 @@ For periodic web intelligence gathering:
 
 ## 14. Risk Mitigation
 
-| Risk | Probability | Impact | Mitigation |
-|---|---|---|---|
-| Plivo WebSocket fails on Vercel | High | Critical | Deploy WebSocket server separately on Railway (Option A in §11) |
-| Plivo number not provisioned in time | Medium | Critical | Pre-provision number before hackathon day; have a fallback demo using a pre-recorded call |
-| Gemini API rate limits | Low | Medium | Use `gemini-2.5-flash` (generous free tier), batch evaluation requests |
-| You.com API latency | Low | Low | Cache intelligence results in Supabase with 6-hour TTL |
-| Composio auth flow complexity | Medium | Medium | Pre-authenticate test accounts before demo; show verification results from cached data if live auth fails |
-| Intercom OAuth setup time | Medium | Medium | Use a pre-configured development workspace with seed data |
-| Voice evaluation audio quality | Medium | Medium | Use a quiet room for demo; have a pre-recorded evaluation as backup; Gemini Live API's built-in VAD helps filter noise |
-| Gemini Live API latency | Medium | High | Native audio model is still in preview; test latency before demo day. Fallback: use `gemini-live-2.5-flash-preview` (half-cascade, text mode) with separate Gemini TTS (`gemini-2.5-flash-preview-tts`) |
-| Mulaw ↔ PCM conversion | Low | Medium | Use `wavefile` npm package, well-tested; pre-validate conversion pipeline with a recorded Plivo call |
-| Next.js 16 proxy.ts unfamiliarity | Low | Low | Minimal proxy logic needed; fallback to route-level auth checks |
+| Risk                                 | Probability | Impact   | Mitigation                                                                                                                                                                                              |
+| ------------------------------------ | ----------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plivo WebSocket fails on Vercel      | High        | Critical | Deploy WebSocket server separately on Railway (Option A in §11)                                                                                                                                         |
+| Plivo number not provisioned in time | Medium      | Critical | Pre-provision number before hackathon day; have a fallback demo using a pre-recorded call                                                                                                               |
+| Gemini API rate limits               | Low         | Medium   | Use `gemini-2.5-flash` (generous free tier), batch evaluation requests                                                                                                                                  |
+| You.com API latency                  | Low         | Low      | Cache intelligence results in Supabase with 6-hour TTL                                                                                                                                                  |
+| Composio auth flow complexity        | Medium      | Medium   | Pre-authenticate test accounts before demo; show verification results from cached data if live auth fails                                                                                               |
+| Intercom OAuth setup time            | Medium      | Medium   | Use a pre-configured development workspace with seed data                                                                                                                                               |
+| Voice evaluation audio quality       | Medium      | Medium   | Use a quiet room for demo; have a pre-recorded evaluation as backup; Gemini Live API's built-in VAD helps filter noise                                                                                  |
+| Gemini Live API latency              | Medium      | High     | Native audio model is still in preview; test latency before demo day. Fallback: use `gemini-live-2.5-flash-preview` (half-cascade, text mode) with separate Gemini TTS (`gemini-2.5-flash-preview-tts`) |
+| Mulaw ↔ PCM conversion               | Low         | Medium   | Use `wavefile` npm package, well-tested; pre-validate conversion pipeline with a recorded Plivo call                                                                                                    |
+| Next.js 16 proxy.ts unfamiliarity    | Low         | Low      | Minimal proxy logic needed; fallback to route-level auth checks                                                                                                                                         |
 
 ### Critical Pre-Hackathon Checklist
 
@@ -1484,56 +1478,56 @@ These are real, publicly accessible AI agents that Litmus can evaluate during th
 
 ### Customer Support Agents
 
-| Agent | Vendor | Access Method | Why It's a Good Test Case |
-|---|---|---|---|
-| **Intercom Fin 3** | Intercom | Intercom API (Fin over API) + any public Intercom Messenger widget | The hackathon's primary sponsor. Fin 3 introduced Procedures, Simulations, and Voice. Pulling Fin's verified resolution rate via the Intercom API is a direct demo of Litmus's "verified metrics" differentiator. Test against Fin's own published 66% average resolution rate claim. |
-| **Zendesk AI Agent** | Zendesk | Public help center chat widgets (many companies deploy these publicly) | Direct competitor to Fin. Benchmarking Fin vs. Zendesk side-by-side on the same support tickets is the ultimate demo moment. Find a company using Zendesk AI on their public support page and run a live comparison. |
-| **Ada AI Agent** | Ada | Public customer chat widgets | Ada serves brands like Meta, Shopify, and Square. Their agents are deployed on many public e-commerce support pages. Good for testing support quality across different knowledge domains. |
-| **Tidio Lyro** | Tidio | Public website chat widgets | Commonly deployed on small-to-medium business websites. Tests how Litmus handles lower-tier agents vs. enterprise ones. Useful for showing score variance across quality tiers. |
+| Agent                | Vendor   | Access Method                                                          | Why It's a Good Test Case                                                                                                                                                                                                                                                             |
+| -------------------- | -------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Intercom Fin 3**   | Intercom | Intercom API (Fin over API) + any public Intercom Messenger widget     | The hackathon's primary sponsor. Fin 3 introduced Procedures, Simulations, and Voice. Pulling Fin's verified resolution rate via the Intercom API is a direct demo of Litmus's "verified metrics" differentiator. Test against Fin's own published 66% average resolution rate claim. |
+| **Zendesk AI Agent** | Zendesk  | Public help center chat widgets (many companies deploy these publicly) | Direct competitor to Fin. Benchmarking Fin vs. Zendesk side-by-side on the same support tickets is the ultimate demo moment. Find a company using Zendesk AI on their public support page and run a live comparison.                                                                  |
+| **Ada AI Agent**     | Ada      | Public customer chat widgets                                           | Ada serves brands like Meta, Shopify, and Square. Their agents are deployed on many public e-commerce support pages. Good for testing support quality across different knowledge domains.                                                                                             |
+| **Tidio Lyro**       | Tidio    | Public website chat widgets                                            | Commonly deployed on small-to-medium business websites. Tests how Litmus handles lower-tier agents vs. enterprise ones. Useful for showing score variance across quality tiers.                                                                                                       |
 
 **How to test support agents without API access:** Many companies deploy their AI support agents on public-facing help pages. For the demo, identify 3–4 companies using different agents (check their chat widget — Intercom shows the Intercom logo, Zendesk shows "Powered by Zendesk," etc.) and run the same 5 support questions against each. Gemini judges the responses.
 
 ### Voice Agents
 
-| Agent | Vendor | Access Method | Why It's a Good Test Case |
-|---|---|---|---|
-| **Bland AI** | Bland | REST API (`api.bland.ai`) — free trial available, can trigger outbound calls to a phone number | Purpose-built voice agent platform. Call their demo line, pipe the audio through Plivo → Gemini Live API, and score the interaction. This is the flagship demo for Litmus's voice evaluation feature. |
-| **Vapi** | Vapi | REST API (`api.vapi.ai`) — free tier with 10 minutes of calls | Another major voice agent platform. Create a test assistant, have Litmus call it, and benchmark naturalness, latency, and helpfulness against Bland. |
-| **Retell AI** | Retell | REST API + WebSocket — free trial | Competes directly with Bland and Vapi. Has a "phone call" API where you can trigger calls. Third data point for voice agent comparison. |
-| **Google Dialogflow CX** | Google | Telephony integration via CCAI | Google's own voice agent platform. Interesting to benchmark since Litmus uses Gemini as the judge — testing how Gemini-as-judge evaluates a Google-built agent adds credibility to the impartiality claim. |
+| Agent                    | Vendor | Access Method                                                                                  | Why It's a Good Test Case                                                                                                                                                                                  |
+| ------------------------ | ------ | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bland AI**             | Bland  | REST API (`api.bland.ai`) — free trial available, can trigger outbound calls to a phone number | Purpose-built voice agent platform. Call their demo line, pipe the audio through Plivo → Gemini Live API, and score the interaction. This is the flagship demo for Litmus's voice evaluation feature.      |
+| **Vapi**                 | Vapi   | REST API (`api.vapi.ai`) — free tier with 10 minutes of calls                                  | Another major voice agent platform. Create a test assistant, have Litmus call it, and benchmark naturalness, latency, and helpfulness against Bland.                                                       |
+| **Retell AI**            | Retell | REST API + WebSocket — free trial                                                              | Competes directly with Bland and Vapi. Has a "phone call" API where you can trigger calls. Third data point for voice agent comparison.                                                                    |
+| **Google Dialogflow CX** | Google | Telephony integration via CCAI                                                                 | Google's own voice agent platform. Interesting to benchmark since Litmus uses Gemini as the judge — testing how Gemini-as-judge evaluates a Google-built agent adds credibility to the impartiality claim. |
 
 **Demo strategy for voice agents:** Pre-configure a Bland AI and Vapi test assistant with identical system prompts (e.g., "You are a pizza restaurant booking agent"). During the live demo, call both through Litmus's Plivo voice evaluation, then show the side-by-side Gemini evaluation scores on stage.
 
 ### Coding Copilots / General Assistants
 
-| Agent | Vendor | Access Method | Why It's a Good Test Case |
-|---|---|---|---|
-| **Claude (Anthropic)** | Anthropic | REST API (`api.anthropic.com/v1/messages`) | One of the top-tier LLMs. Use as a baseline "gold standard" for text-based benchmarks. Run Litmus's `text_qa` and `code_gen` benchmark suites against it. |
-| **GPT-4o** | OpenAI | REST API (`api.openai.com/v1/chat/completions`) | The other top-tier LLM. Head-to-head benchmarking GPT-4o vs. Claude on identical tasks, judged by Gemini, demonstrates Litmus's neutrality. |
-| **Gemini 2.5 Flash** | Google | `@google/genai` SDK | Interesting meta-case: Gemini evaluating itself. Address this directly in the demo — "Yes, the judge is also a contestant. Here's why the scores are still credible..." (standardized rubric, structured output, no self-recognition in the evaluation prompt). |
-| **Mistral Large** | Mistral | REST API (`api.mistral.ai/v1/chat/completions`) | Strong European alternative. Tests whether Litmus can benchmark agents that have different API shapes — the adapter pattern in the benchmarking engine needs to handle varying response formats. |
-| **Llama 4 (via Together AI)** | Meta / Together | REST API (`api.together.xyz/v1/chat/completions`) | Open-source model benchmark. Together AI hosts Llama with an OpenAI-compatible API. Good for testing the "open-source vs. proprietary" comparison narrative. |
+| Agent                         | Vendor          | Access Method                                     | Why It's a Good Test Case                                                                                                                                                                                                                                       |
+| ----------------------------- | --------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Claude (Anthropic)**        | Anthropic       | REST API (`api.anthropic.com/v1/messages`)        | One of the top-tier LLMs. Use as a baseline "gold standard" for text-based benchmarks. Run Litmus's `text_qa` and `code_gen` benchmark suites against it.                                                                                                       |
+| **GPT-4o**                    | OpenAI          | REST API (`api.openai.com/v1/chat/completions`)   | The other top-tier LLM. Head-to-head benchmarking GPT-4o vs. Claude on identical tasks, judged by Gemini, demonstrates Litmus's neutrality.                                                                                                                     |
+| **Gemini 2.5 Flash**          | Google          | `@google/genai` SDK                               | Interesting meta-case: Gemini evaluating itself. Address this directly in the demo — "Yes, the judge is also a contestant. Here's why the scores are still credible..." (standardized rubric, structured output, no self-recognition in the evaluation prompt). |
+| **Mistral Large**             | Mistral         | REST API (`api.mistral.ai/v1/chat/completions`)   | Strong European alternative. Tests whether Litmus can benchmark agents that have different API shapes — the adapter pattern in the benchmarking engine needs to handle varying response formats.                                                                |
+| **Llama 4 (via Together AI)** | Meta / Together | REST API (`api.together.xyz/v1/chat/completions`) | Open-source model benchmark. Together AI hosts Llama with an OpenAI-compatible API. Good for testing the "open-source vs. proprietary" comparison narrative.                                                                                                    |
 
 ### Research Agents
 
-| Agent | Vendor | Access Method | Why It's a Good Test Case |
-|---|---|---|---|
-| **You.com Research Agent** | You.com | Advanced Agent API (`api.ydc-index.io`) | A hackathon sponsor's own product. Using You.com's Advanced Agent API (multi-turn reasoning with iterative planning) as a test subject — then searching for reviews of it via You.com's Search API — is a compelling recursive demo. |
-| **Perplexity** | Perplexity | REST API (`api.perplexity.ai/chat/completions`) | Leading search-augmented AI. Benchmark its research output quality against You.com's Research Agent on the same queries. |
-| **Tavily** | Tavily | REST API — purpose-built for AI agent search | Designed specifically as a search tool for AI agents. Different architecture than You.com (returns pre-processed results). Tests whether Litmus can benchmark tool-type agents, not just chat agents. |
+| Agent                      | Vendor     | Access Method                                   | Why It's a Good Test Case                                                                                                                                                                                                            |
+| -------------------------- | ---------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **You.com Research Agent** | You.com    | Advanced Agent API (`api.ydc-index.io`)         | A hackathon sponsor's own product. Using You.com's Advanced Agent API (multi-turn reasoning with iterative planning) as a test subject — then searching for reviews of it via You.com's Search API — is a compelling recursive demo. |
+| **Perplexity**             | Perplexity | REST API (`api.perplexity.ai/chat/completions`) | Leading search-augmented AI. Benchmark its research output quality against You.com's Research Agent on the same queries.                                                                                                             |
+| **Tavily**                 | Tavily     | REST API — purpose-built for AI agent search    | Designed specifically as a search tool for AI agents. Different architecture than You.com (returns pre-processed results). Tests whether Litmus can benchmark tool-type agents, not just chat agents.                                |
 
 ### Agents Testable via Composio
 
 These agents claim specific tool integrations that Litmus can verify through Composio's 850+ toolkits:
 
-| Claimed Integration | Composio Toolkit | Test Action | What We Verify |
-|---|---|---|---|
-| "Creates GitHub issues from support tickets" | `GITHUB` | `GITHUB_CREATE_ISSUE` (use a test repo) | Agent can actually write to GitHub, not just claim it |
-| "Sends Slack notifications on escalation" | `SLACK` | `SLACK_SEND_MESSAGE` (use a test channel) | Agent can post to Slack with correct formatting |
-| "Creates Jira tickets" | `JIRA` | `JIRA_CREATE_ISSUE` | Agent produces valid Jira payloads |
-| "Updates Salesforce records" | `SALESFORCE` | `SALESFORCE_CREATE_RECORD` (sandbox) | Agent can write CRM data correctly |
-| "Sends follow-up emails" | `GMAIL` | `GMAIL_SEND_EMAIL` (to a test address) | Agent can compose and send proper emails |
-| "Schedules calendar events" | `GOOGLE_CALENDAR` | `GOOGLE_CALENDAR_CREATE_EVENT` | Agent produces valid event data with correct times |
+| Claimed Integration                          | Composio Toolkit  | Test Action                               | What We Verify                                        |
+| -------------------------------------------- | ----------------- | ----------------------------------------- | ----------------------------------------------------- |
+| "Creates GitHub issues from support tickets" | `GITHUB`          | `GITHUB_CREATE_ISSUE` (use a test repo)   | Agent can actually write to GitHub, not just claim it |
+| "Sends Slack notifications on escalation"    | `SLACK`           | `SLACK_SEND_MESSAGE` (use a test channel) | Agent can post to Slack with correct formatting       |
+| "Creates Jira tickets"                       | `JIRA`            | `JIRA_CREATE_ISSUE`                       | Agent produces valid Jira payloads                    |
+| "Updates Salesforce records"                 | `SALESFORCE`      | `SALESFORCE_CREATE_RECORD` (sandbox)      | Agent can write CRM data correctly                    |
+| "Sends follow-up emails"                     | `GMAIL`           | `GMAIL_SEND_EMAIL` (to a test address)    | Agent can compose and send proper emails              |
+| "Schedules calendar events"                  | `GOOGLE_CALENDAR` | `GOOGLE_CALENDAR_CREATE_EVENT`            | Agent produces valid event data with correct times    |
 
 ### Recommended Demo Agent Set (5 Agents, Maximum Impact)
 
@@ -1580,4 +1574,4 @@ npm run dev
 
 ---
 
-*Spec authored for the Continual Learning Hackathon — February 2026. San Francisco, CA. Litmus — the litmus test for AI agents.*
+_Spec authored for the Continual Learning Hackathon — February 2026. San Francisco, CA. Litmus — the litmus test for AI agents._

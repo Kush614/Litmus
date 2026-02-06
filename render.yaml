@@ -1,0 +1,52 @@
+services:
+  # Next.js Web Application
+  - type: web
+    name: litmus
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PLIVO_AUTH_ID
+        sync: false
+      - key: PLIVO_AUTH_TOKEN
+        sync: false
+      - key: PLIVO_PHONE_NUMBER
+        sync: false
+      - key: YOUCOM_API_KEY
+        sync: false
+      - key: COMPOSIO_API_KEY
+        sync: false
+      - key: INTERCOM_ACCESS_TOKEN
+        sync: false
+      - key: INTERCOM_APP_ID
+        sync: false
+      - key: WS_SERVER_URL
+        sync: false
+      - key: CRON_SECRET
+        sync: false
+
+  # WebSocket Server for Plivo Audio Streaming
+  - type: web
+    name: litmus-ws
+    runtime: docker
+    plan: free
+    dockerfilePath: ./ws-server/Dockerfile
+    dockerContext: ./ws-server
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: LITMUS_API_URL
+        sync: false
+      - key: PORT
+        value: "8080"
