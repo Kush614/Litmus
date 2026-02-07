@@ -21,12 +21,12 @@ export function buildStreamResponse(params: {
     streamUrl.searchParams.set("agent_name", params.agentName);
   }
 
-  const streamElement = plivoResponse.addStream(streamUrl.toString());
-  streamElement.addAttribute("keepCallAlive", "true");
-  streamElement.addAttribute("bidirectional", "true");
-  streamElement.addAttribute("contentType", "audio/x-mulaw;rate=8000");
-  streamElement.addAttribute("streamTimeout", "600");
-  streamElement.addAttribute("statusCallbackUrl", params.statusCallbackUrl);
+  plivoResponse.addStream(streamUrl.toString(), {
+    keepCallAlive: "true",
+    audioTrack: "both",
+    contentType: "audio/x-mulaw;rate=8000",
+    statusCallbackUrl: params.statusCallbackUrl,
+  });
 
   return plivoResponse.toXML();
 }

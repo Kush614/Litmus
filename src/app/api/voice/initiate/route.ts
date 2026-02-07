@@ -12,12 +12,22 @@ import {
 // Schema
 // ---------------------------------------------------------------------------
 
-const initiateCallSchema = z.object({
+const phoneNumberSchema = z
+  .string()
+  .regex(/^\+[1-9]\d{1,14}$/, "Phone number must be in E.164 format (e.g., +14155551234)");
+
+const agentCallSchema = z.object({
   agent_id: z.string().uuid(),
-  phone_number: z
-    .string()
-    .regex(/^\+[1-9]\d{1,14}$/, "Phone number must be in E.164 format (e.g., +14155551234)"),
+  phone_number: phoneNumberSchema,
 });
+
+const discoveryCallSchema = z.object({
+  agent_id: z.literal("discovery"),
+  phone_number: phoneNumberSchema,
+  discovery_session_id: z.string().uuid(),
+});
+
+const initiateCallSchema = z.union([discoveryCallSchema, agentCallSchema]);
 
 function getBearerToken(request: Request): string | undefined {
   const authorization = request.headers.get("authorization");
@@ -54,7 +64,31 @@ export async function POST(request: Request): Promise<Response> {
       throw new UnauthorizedError("Invalid or expired session");
     }
 
-    // Verify the agent exists
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL(request.url).origin;
+    const isDiscovery = data.agent_id === "discovery";
+
+    if (isDiscovery) {
+      // Discovery call — no specific agent, conversation drives tool research
+      const discoveryData = data as z.infer<typeof discoveryCallSchema>;
+
+      const { requestUuid } = await initiateCall({
+        to: data.phone_number,
+        agentId: "discovery",
+        answerUrl: `${appUrl}/api/voice/answer?agent_id=discovery&discovery_session_id=${discoveryData.discovery_session_id}`,
+        hangupUrl: `${appUrl}/api/webhooks/plivo`,
+      });
+
+      return Response.json(
+        {
+          call_uuid: requestUuid,
+          discovery_session_id: discoveryData.discovery_session_id,
+          status: "initiating",
+        },
+        { status: 201 }
+      );
+    }
+
+    // Agent evaluation call — existing flow
     const { data: agent, error: agentError } = await supabase
       .from("agents")
       .select("id, name")
@@ -64,9 +98,6 @@ export async function POST(request: Request): Promise<Response> {
     if (agentError) throw agentError;
     if (!agent) throw new NotFoundError("Agent");
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL(request.url).origin;
-
-    // Initiate the Plivo outbound call
     const { requestUuid } = await initiateCall({
       to: data.phone_number,
       agentId: data.agent_id,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,7 @@ export default function DiscoverPage() {
   const [pastSessions, setPastSessions] = useState<SessionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const shouldAutoResume = useRef(true);
 
   const loadSession = useCallback(async (id: string) => {
     const response = await fetch(`/api/discovery/sessions/${id}`);
@@ -53,12 +54,15 @@ export default function DiscoverPage() {
       const sessions: SessionSummary[] = data.sessions ?? [];
       setPastSessions(sessions);
 
-      // Check if there's an active session
-      const active = sessions.find(
-        (s: SessionSummary) => s.status === "active" || s.status === "researching"
-      );
-      if (active) {
-        await loadSession(active.id);
+      // Only auto-resume active sessions on initial page load
+      if (shouldAutoResume.current) {
+        shouldAutoResume.current = false;
+        const active = sessions.find(
+          (s: SessionSummary) => s.status === "active" || s.status === "researching"
+        );
+        if (active) {
+          await loadSession(active.id);
+        }
       }
     } catch {
       // If fetching fails, user likely needs to log in
@@ -126,6 +130,9 @@ export default function DiscoverPage() {
             size="sm"
             onClick={() => {
               setActiveSessionId(null);
+              setInitialHistory([]);
+              setInitialStatus("active");
+              setInitialMatches(null);
               loadSessions();
             }}
           >
