@@ -14,7 +14,7 @@ export function getGeminiClient(): GoogleGenAI {
 }
 
 export const MODELS = {
-  FLASH: "gemini-2.5-flash",
+  FLASH: "gemini-3-flash-preview",
   PRO: "gemini-2.5-pro",
   NATIVE_AUDIO: "gemini-2.5-flash-native-audio-preview-12-2025",
   TTS: "gemini-2.5-flash-preview-tts",

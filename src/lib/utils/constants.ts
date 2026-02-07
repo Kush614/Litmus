@@ -39,8 +39,8 @@ export const MAX_COMPARE_AGENTS = 4;
 export const INTELLIGENCE_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 export const GEMINI_MODELS = {
-  FLASH: "gemini-2.5-flash",
-  PRO: "gemini-2.5-pro",
+  FLASH: "gemini-3-flash-preview",
+  PRO: "gemini-3-pro-preview",
   NATIVE_AUDIO: "gemini-2.5-flash-native-audio-preview-12-2025",
   TTS: "gemini-2.5-flash-preview-tts",
 } as const;

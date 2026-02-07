@@ -57,7 +57,7 @@ export function DiscoveryChat({
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, streamingText, scrollToBottom]);
+  }, [messages, streamingText, isStreaming, statusMessage, scrollToBottom]);
 
   // Cleanup polling on unmount
   useEffect(() => {
@@ -270,12 +270,13 @@ export function DiscoveryChat({
           {/* Typing indicator */}
           {isStreaming && !streamingText && (
             <div className="flex justify-start">
-              <div className="bg-muted rounded-2xl px-4 py-3 text-sm">
+              <div className="bg-muted rounded-2xl px-4 py-3 text-sm flex items-center gap-2">
                 <span className="flex gap-1">
                   <span className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" />
                   <span className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce [animation-delay:150ms]" />
                   <span className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce [animation-delay:300ms]" />
                 </span>
+                <span className="text-muted-foreground text-xs">Thinking...</span>
               </div>
             </div>
           )}
